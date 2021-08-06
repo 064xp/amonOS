@@ -6,6 +6,8 @@ Equipo:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "modules/lexer.h"
 #include "modules/filesystem.h"
@@ -27,56 +29,57 @@ void roundRobin(void);
 
 int main(){
 
-  while(opc != -1){
-    opc = menu();
-    switch(opc){
-      case 1:
-        create(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL, 0);
-        format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
-        break;
-      case 2:
-        create(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL, 1);
-        format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
-        break;
-      case 3:
-        printf("\n------------------------\n\n");
-        printf("Listando archivos en el directorio raiz\n");
-        list((Dir *) datos[0], listaInodos);
-        printf("\n\n");
-        break;
-      case 4:
-        printf("Ingresa el nombre del archivo:\n");
-        scanf("%s", buffer);
-        if(buffer[0] != '/')
-          prepend(buffer, "/");
-
-        file = namei(datos, listaInodos, buffer);
-        fileInode = getInode(listaInodos, file->iNodo);
-
-        if(fileInode->type == 'd'){
-          printf("%s Es un directorio, listando sus archivos:\n\n", buffer);
-          fileDir = (Dir *) getBlock(datos, fileInode, 0);
-          list(fileDir, listaInodos);
-          printf("\n");
-        } else if(fileInode->type == '-'){
-          printf("\nContenido de: %s\n\n", buffer);
-          printf("%s\n\n", (char *) getBlock(datos, fileInode, 0));
-          printf("------------------------------\n\n");
-        }
-        break;
-      case 5:
-        delete(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL);
-        format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
-        break;
-      case 6:
-        roundRobin();
-        break;
-      case -1:
-        break;
-      default:
-        printf("Opcion no soportada\n");
-    } //fin switch
-  }
+  fsInit();
+  // while(opc != -1){
+  //   opc = menu();
+  //   switch(opc){
+  //     case 1:
+  //       create(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL, 0);
+  //       format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
+  //       break;
+  //     case 2:
+  //       create(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL, 1);
+  //       format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
+  //       break;
+  //     case 3:
+  //       printf("\n------------------------\n\n");
+  //       printf("Listando archivos en el directorio raiz\n");
+  //       list((Dir *) datos[0], listaInodos);
+  //       printf("\n\n");
+  //       break;
+  //     case 4:
+  //       printf("Ingresa el nombre del archivo:\n");
+  //       scanf("%s", buffer);
+  //       if(buffer[0] != '/')
+  //         prepend(buffer, "/");
+  //
+  //       file = namei(datos, listaInodos, buffer);
+  //       fileInode = getInode(listaInodos, file->iNodo);
+  //
+  //       if(fileInode->type == 'd'){
+  //         printf("%s Es un directorio, listando sus archivos:\n\n", buffer);
+  //         fileDir = (Dir *) getBlock(datos, fileInode, 0);
+  //         list(fileDir, listaInodos);
+  //         printf("\n");
+  //       } else if(fileInode->type == '-'){
+  //         printf("\nContenido de: %s\n\n", buffer);
+  //         printf("%s\n\n", (char *) getBlock(datos, fileInode, 0));
+  //         printf("------------------------------\n\n");
+  //       }
+  //       break;
+  //     case 5:
+  //       delete(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL);
+  //       format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
+  //       break;
+  //     case 6:
+  //       roundRobin();
+  //       break;
+  //     case -1:
+  //       break;
+  //     default:
+  //       printf("Opcion no soportada\n");
+  //   } //fin switch
+  // }
 
   return 0;
 }

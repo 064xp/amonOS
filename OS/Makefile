@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS= -Wall -I.
+CFLAGS= -Wall
 OBJS =  main.c modules/lexer.c modules/filesystem.c
 LIBS =
 

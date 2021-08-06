@@ -64,7 +64,6 @@ int execute(int argc, char argv[][TOKENLEN]){
   y llama la función correspondiente con sus argumentos.
 */
 void executeCommand(char *command){
-  int i;
   int argc, error;
   char argv[ARG_AMMOUNT][TOKENLEN];
 

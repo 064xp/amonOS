@@ -1,6 +1,3 @@
-#ifndef FUNCTIONS_H_INCLUDED
-#define FUNCTIONS_H_INCLUDED
-
 #include <string.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,5 +12,3 @@
 void separateCommand(char *command, int *argc, char argv[][TOKENLEN]);
 int execute(int argc, char argv[][TOKENLEN]);
 void executeCommand(char *command);
-
-#endif

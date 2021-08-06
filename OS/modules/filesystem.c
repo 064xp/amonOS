@@ -1,68 +1,101 @@
 #include "filesystem.h"
 
-//64 bytes total
-typedef struct iNodo {
-  char type;
-  char perms[6];
-  unsigned char links;
-  char owner[12];
-  unsigned int size;
-  unsigned int lastModified;
-  int contentTable[9];
-} iNodo;
-
-typedef struct dir {
-  int iNodo;
-  char nombre[12];
-} Dir;
+FreeQueue LIL = {{}, 0, -1, 256, 0};
+FreeQueue LBL = {{}, 0, -1, 256, 0};
 
 void fsInit(){
-  int LIL [15] = {3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
-  int LBL [15] = {10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
-  int indiceLIL = 0, indiceLBL = 0;
-  char buffer[1024], contentBuffer[1025];
-  iNodo *fileInode;
-  Dir *file, *fileDir;
-
-  //bloques
-  // 1024 - 8 = 1016 bloques restantes
-  // 4 + 12 = 16 bytes/archivo (struct dir)
-  //1 bloque = 1024 bytes
-  // 1024 / 16 bytes(archivo) = 64 archivos/bloque
-  char boot[1024] = {0};
   char super[2048];
   iNodo listaInodos[5][16];
-  // 50 bloques de 1024 bytes cada uno
-  char datos[TOTALBLKS - 8][1024];
+  Dir root[64];
 
-  if(load(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL) == -1){
+  if(load(super, listaInodos) == -1){
     printf("File System no encontrado, creando raiz...\n\n");
-    crearRaiz(datos[0], listaInodos);
-    format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
+    initINodeList(listaInodos);
+    initSuperBlock(super);
+    crearRaiz(root, listaInodos);
+    format(super, listaInodos, root);
   } else {
     printf("File System encontrado, cargando...\n\n");
   }
 
+  fillLIL(listaInodos);
+  fillLBL(super);
 }
 
-void format(char bootBlock[1024], char superBlock[2048], iNodo LI[5][16], char datos[50][1024], int *indiceLIL, int *indiceLBL){
+void fillLIL(iNodo listaInodos[][16]){
+  int i, j;
+
+  for(i=0; i<5; i++){
+    for(j=0; j<16; j++){
+      if(listaInodos[i][j].type == 0){
+        enqueue(&LIL, (5*i) + (j+1));
+      }
+      if(LIL.size == LIL.capacity) return;
+    }
+  }
+}
+
+void fillLBL(char *superBlock){
+  int i;
+
+  for(i=0; i<2048; i++){
+    if(superBlock[i] == 0){
+      enqueue(&LBL, i);
+    }
+    if(LBL.size == LBL.capacity) return;
+  }
+}
+
+void initINodeList(iNodo iNodeList[][16]){
+  int i, j;
+
+  for(i=0; i<5; i++){
+    for(j=0; j<16; j++){
+      iNodeList[i][j].type = 0;
+    }
+  }
+
+  iNodeList[0][0].type = '-';
+}
+
+/*
+  Pone todos los valores en 0,
+  0: Bloque libre
+  1: Bloque ocupado
+*/
+void initSuperBlock(char *superBlock){
+  int i;
+
+  for(i=0; i<2048; i++){
+    superBlock[i] = 0;
+  }
+}
+
+void format(char superBlock[2048], iNodo LI[][16], Dir *root){
+    //bloques
+    // 1024 - 8 = 1016 bloques restantes
+    // 4 + 12 = 16 bytes/archivo (struct dir)
+    //1 bloque = 1024 bytes
+    // 1024 / 16 bytes(archivo) = 64 archivos/bloque
+    char bootBlock[1024] = {0};
+    char datos[TOTALBLKS - 8][1024];
     int fd;
+
     fd = open("Fs", O_WRONLY|O_CREAT);
     if (fd==-1){
         perror("");
         return;
     }
 
+    memcpy(datos[0], root, sizeof(Dir) * 64);
     write(fd, bootBlock, 1024);
     write(fd, superBlock, 2048);
     write(fd, LI, sizeof(iNodo)*5*16);
     write(fd, datos, 50 * 1024);
-    write(fd, indiceLIL, sizeof(int));
-    write(fd, indiceLBL, sizeof(int));
     close(fd);
 }
 
-int load(char bb[1024], char SB[2048], iNodo LI[5][16], char datos[50][1024], int *indiceLIL, int *indiceLBL){
+int load(char SB[2048], iNodo LI[][16]){
   int fd;
   fd = open("Fs", O_RDONLY);
   if (fd==-1){
@@ -70,18 +103,15 @@ int load(char bb[1024], char SB[2048], iNodo LI[5][16], char datos[50][1024], in
       return -1;
   }
 
-  read(fd, bb, 1024);
+  lseek(fd, 1024, SEEK_SET);
   read(fd, SB, 2048);
   read(fd, LI, sizeof(iNodo)*5*16);
-  read(fd, datos, 50 * 1024);
-  read(fd, indiceLIL, sizeof(int));
-  read(fd, indiceLBL, sizeof(int));
   close(fd);
 
   return 0;
 }
 
-void crearRaiz(char *bloque, iNodo listaInodos[][16]){
+void crearRaiz(Dir *bloque, iNodo listaInodos[][16]){
   int i;
   Dir root[64] = {
     {2, "."}, //Numero de I Nodo, nombre dir
@@ -241,6 +271,8 @@ int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indi
   (*indiceLIL)--;
   LIL[*indiceLIL] = file->iNodo;
   file->iNodo = 0;
+
+  return 0;
 }
 
 
@@ -291,6 +323,35 @@ Dir *namei(char datos[][1024], iNodo listaInodos[][16], char *path){
   }
   return file;
 }
+
+
+// Funciones de Fila
+
+int enqueue(FreeQueue *queue, int newVal){
+    if(queue->size == queue->capacity){
+        return 1;
+    }
+    //Lo tratamos como un arreglo circular, para evitar recorrer a todos los elementos al quitar uno
+    //https://en.wikipedia.org/wiki/Circular_buffer#Circular_buffer_mechanics
+    //indice = (indice + 1) % tamaño máximo
+    queue->end = (queue->end + 1) % queue->capacity;
+    queue->list[queue->end] = newVal;
+    queue->size++;
+    return 0;
+}
+
+int dequeue(FreeQueue *queue){
+    int element = -1;
+
+    if(queue->size == 0){
+        return element;
+    }
+    element = queue->list[queue->start];
+    queue->start = (queue->start+1) % queue->capacity;
+    queue->size--;
+    return element;
+}
+
 
 time_t getCurrentTime(){
   time_t  secs;
