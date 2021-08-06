@@ -44,9 +44,7 @@ void separateCommand(char *command, int *argc, char argv[][TOKENLEN]){
 */
 int execute(int argc, char argv[][TOKENLEN]){
   int i, retVal;
-  Command commands [COMMANDSLEN] = {
-    {"ls", &testls}
-  };
+  Command commands [COMMANDSLEN] = {};
 
   for(i=0; i<COMMANDSLEN; i++){
     if(strcmp(argv[0], commands[i].name) == 0){
