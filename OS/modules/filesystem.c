@@ -28,9 +28,11 @@ void fillLIL(iNodo listaInodos[][16]){
   for(i=0; i<5; i++){
     for(j=0; j<16; j++){
       if(listaInodos[i][j].type == 0){
-        enqueue(&LIL, (5*i) + (j+1));
+        // Enqueue número de I nodo
+        enqueue(&LIL, (16*i) + (j+1));
       }
-      if(LIL.size == LIL.capacity) return;
+      if(LIL.size == LIL.capacity)
+        return;
     }
   }
 }
@@ -66,8 +68,12 @@ void initINodeList(iNodo iNodeList[][16]){
 void initSuperBlock(char *superBlock){
   int i;
 
-  for(i=0; i<2048; i++){
+  for(i=10; i<TOTALBLKS; i++){
     superBlock[i] = 0;
+  }
+
+  for(i=TOTALBLKS; i<2048; i++){
+    superBlock[i] = 1;
   }
 }
 
