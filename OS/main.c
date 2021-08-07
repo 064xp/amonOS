@@ -28,8 +28,8 @@ int buscarIndice(int lista[], int pid, int len);
 void roundRobin(void);
 
 int main(){
-
   fsInit();
+
   // while(opc != -1){
   //   opc = menu();
   //   switch(opc){

@@ -239,65 +239,91 @@ void create(
 }
 
 int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL){
-  char buffer[200];
-  iNodo *fileInode;
-  Dir *file;
-  int i;
+  // char buffer[200];
+  // iNodo *fileInode;
+  // Dir *file;
+  // int i;
+  //
+  // printf("Ingresa el nombre del archivo:\n");
+  // scanf("%s", buffer );
+  //
+  // if(strcmp(buffer, "/") == 0){
+  //   printf("No se puede borrar el directorio raiz\n");
+  //   return -1;
+  // }
+  //
+  // if(buffer[0] != '/')
+  //   prepend(buffer, "/");
+  //
+  // namei(datos, listaInodos, buffer);
+  // if(file == NULL){
+  //   printf("No se econtro el archivo\n");
+  //   return -1;
+  // }
+  //
+  // fileInode = getInode(listaInodos, file->iNodo);
+  //
+  // // Liberar bloques
+  // for(i=0; i<9; i++){
+  //   if(fileInode->contentTable[i] != 0){
+  //     (*indiceLBL)--;
+  //     LBL[*indiceLBL] = fileInode->contentTable[i];
+  //   } else {
+  //     break;
+  //   }
+  // }
+  //
+  // // Liberar el I Nodo
+  // (*indiceLIL)--;
+  // LIL[*indiceLIL] = file->iNodo;
+  // file->iNodo = 0;
+  //
+  return 0;
+}
 
-  printf("Ingresa el nombre del archivo:\n");
-  scanf("%s", buffer );
-
-  if(strcmp(buffer, "/") == 0){
-    printf("No se puede borrar el directorio raiz\n");
-    return -1;
+int getInode(iNodo *destination, int inodo){
+  int fd;
+  fd = open("Fs", O_RDONLY);
+  if (fd==-1){
+      perror("");
+      return -1;
   }
 
-  if(buffer[0] != '/')
-    prepend(buffer, "/");
-
-  file = namei(datos, listaInodos, buffer);
-  if(file == NULL){
-    printf("No se econtro el archivo\n");
-    return -1;
-  }
-
-  fileInode = getInode(listaInodos, file->iNodo);
-
-  // Liberar bloques
-  for(i=0; i<9; i++){
-    if(fileInode->contentTable[i] != 0){
-      (*indiceLBL)--;
-      LBL[*indiceLBL] = fileInode->contentTable[i];
-    } else {
-      break;
-    }
-  }
-
-  // Liberar el I Nodo
-  (*indiceLIL)--;
-  LIL[*indiceLIL] = file->iNodo;
-  file->iNodo = 0;
+  lseek(fd, (3072) + ((inodo-1) * sizeof(iNodo)), SEEK_SET);
+  read(fd, destination, sizeof(iNodo));
+  close(fd);
 
   return 0;
 }
 
+int getBlock(void *destination, int block){
+  int fd;
+  fd = open("Fs", O_RDONLY);
+  if (fd==-1){
+      perror("");
+      return -1;
+  }
 
-iNodo *getInode(iNodo listaInodos[][16], int inodo){
-  iNodo *in = &(listaInodos[inodo/16][(inodo % 16)-1]);
-  return in;
+  lseek(fd, 1024 * (block -1), SEEK_SET);
+  read(fd, destination, 1024);
+  close(fd);
+
+  return 0;
 }
 
-void *getBlock(char datos[][1024], iNodo *inode, int blockIdx){
-  int blockNum = inode->contentTable[blockIdx];
-  return datos[blockNum -9];
-}
-
-Dir *namei(char datos[][1024], iNodo listaInodos[][16], char *path){
-  Dir *file = NULL;
-  Dir *curDir = (Dir *) datos[0]; //comenzamos en dir raiz
-  iNodo *curInode;
+Dir namei(char *path){
+  Dir file;
+  Dir curDir[64];
+  iNodo curInode;
   char buffer[100], search = 0;
   int i, j, cnt = 0;
+
+  //comenzamos en dir raiz
+  getBlock(curDir, 9);
+
+  if(strcmp(path, "/") == 0){
+    return curDir[0];
+  }
 
   for(i=1; i<strlen(path)+1; i++){
     if(search){
@@ -307,14 +333,20 @@ Dir *namei(char datos[][1024], iNodo listaInodos[][16], char *path){
         if(curDir[j].nombre[0] == '\0'){
           break;
         } else if(strcmp(curDir[j].nombre, buffer) == 0){
-          file = &curDir[j];
-          curInode = getInode(listaInodos, file->iNodo);
-          curDir = (Dir *) getBlock(datos, curInode, 0);
+          file = curDir[j];
+          getInode(&curInode, file.iNodo);
+          getBlock(curDir, curInode.contentTable[0]);
           break;
         }
       }
     }
 
+    // Separamos en los espacios, en las diagonales, o
+    // si es final de cadena
+
+    // Ponemos el token leido en buffer y si search = 1
+    // Busca el nombre que se tiene en el buffer en el directorio
+    // actual
     if(path[i] == '/' || path[i] == ' ' ){
       buffer[cnt] = '\0';
       search = 1;

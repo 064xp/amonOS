@@ -39,9 +39,9 @@ int load(char SB[2048], iNodo LI[][16]);
 void format(char superBlock[2048], iNodo LI[][16], Dir *root);
 void list(Dir directorio[64], iNodo listaInodos[][16]);
 void create(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL,char isDir);
-Dir *namei(char datos[][1024], iNodo listaInodos[][16], char *path);
-void *getBlock(char datos[][1024], iNodo *inode, int blockIdx);
-iNodo *getInode(iNodo listaInodos[][16], int inodo);
+Dir namei(char *path);
+int getBlock(void *destination, int block);
+int getInode(iNodo *destination, int inodo);
 void prepend(char* s, const char* t);
 int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL);
 
