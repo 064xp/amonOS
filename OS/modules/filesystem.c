@@ -171,77 +171,66 @@ void list(char *outputBuffer, Dir directorio[64]){
   }
 }
 
-void create(
-  char datos[][1024],
-  iNodo listaInodos[][16],
-  int *indiceLBL,
-  int *indiceLIL,
-  int *LIL,
-  int *LBL,
-  char isDir
-){
+void create(char *fileName, User user, char isDir){
   char nombre[12], contenido[1008];
   int i, j;
   Dir tmpDir[64]; //1024 bytes
-  Dir *root = (Dir *) datos[0];
+  // Dir *root = (Dir *) datos[0];
 
-  if(isDir){
-    printf("Nombre del Directorio:\n");
-    scanf("%s", nombre);
-
-    strcpy(tmpDir[0].nombre, ".");
-    tmpDir[0].iNodo = LIL[*indiceLIL];
-    strcpy(tmpDir[1].nombre, "..");
-    tmpDir[1].iNodo = 2;
-
-    for(i=2; i<64; i++){
-      tmpDir[i].iNodo = 0;
-    }
-  } else {
-    printf("Nombre del Archivo:\n");
-    scanf("%s", nombre);
-    printf("Contenido del Archivo:\n");
-    scanf("%s", contenido);
-  }
+  // if(isDir){
+  //   strcpy(tmpDir[0].nombre, ".");
+  //   tmpDir[0].iNodo = LIL[*indiceLIL];
+  //   strcpy(tmpDir[1].nombre, "..");
+  //   tmpDir[1].iNodo = 2;
+  //
+  //   for(i=2; i<64; i++){
+  //     tmpDir[i].iNodo = 0;
+  //   }
+  // } else {
+  //   printf("Nombre del Archivo:\n");
+  //   scanf("%s", nombre);
+  //   printf("Contenido del Archivo:\n");
+  //   scanf("%s", contenido);
+  // }
 
 
-  for(i=0; i<64; i++){
-    if(root[i].iNodo == 0){
-      for(j=0; j<9; j++){
-        listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].contentTable[j] = 0;
-      }
-      if(isDir){
-        listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].type = 'd';
-        strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].perms, "rwxr--");
-        listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].size = 1024;
-      } else {
-        listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].type = '-';
-        strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].perms, "rw-r--");
-        listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].size = strlen(contenido);
-      }
-
-      listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].links = 1;
-      strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].owner, "paulo");
-      listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].lastModified = 2222;
-      listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].contentTable[0] = LBL[*indiceLBL];
-
-      // -9 ya que hay 9 bloques ocupados inicialmente
-      // datos comienza desde el bloque 8 + 1 bloque del directorio raiz
-      if(isDir){
-        memcpy(datos[LBL[*indiceLBL]-9], tmpDir, sizeof(Dir) * 64);
-      } else {
-        strcpy(datos[LBL[*indiceLBL]-9], contenido);
-      }
-
-      root[i].iNodo = LIL[*indiceLIL];
-      strcpy(root[i].nombre, nombre);
-
-      (*indiceLIL)++;
-      (*indiceLBL)++;
-
-      break;
-    } //fin if
-  } //fin for
+  // for(i=0; i<64; i++){
+  //   if(root[i].iNodo == 0){
+  //     for(j=0; j<9; j++){
+  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].contentTable[j] = 0;
+  //     }
+  //     if(isDir){
+  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].type = 'd';
+  //       strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].perms, "rwxr--");
+  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].size = 1024;
+  //     } else {
+  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].type = '-';
+  //       strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].perms, "rw-r--");
+  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].size = strlen(contenido);
+  //     }
+  //
+  //     listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].links = 1;
+  //     strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].owner, "paulo");
+  //     listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].lastModified = 2222;
+  //     listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].contentTable[0] = LBL[*indiceLBL];
+  //
+  //     // -9 ya que hay 9 bloques ocupados inicialmente
+  //     // datos comienza desde el bloque 8 + 1 bloque del directorio raiz
+  //     if(isDir){
+  //       memcpy(datos[LBL[*indiceLBL]-9], tmpDir, sizeof(Dir) * 64);
+  //     } else {
+  //       strcpy(datos[LBL[*indiceLBL]-9], contenido);
+  //     }
+  //
+  //     root[i].iNodo = LIL[*indiceLIL];
+  //     strcpy(root[i].nombre, nombre);
+  //
+  //     (*indiceLIL)++;
+  //     (*indiceLBL)++;
+  //
+  //     break;
+  //   } //fin if
+  // } //fin for
 }
 
 int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL){
@@ -317,7 +306,7 @@ int getBlock(void *destination, int block){
   return 0;
 }
 
-Dir namei(char *path){
+Dir namei(char *path, User user){
   Dir file = {-1, ""};
   Dir curDir[64];
   iNodo curInode;
@@ -332,6 +321,11 @@ Dir namei(char *path){
 
   if(strcmp(path, "/") == 0){
     return curDir[0];
+  }
+
+  if(path[0] != '/'){
+    strcpy(buffer, path);
+    sprintf(path, "%s%s", user.cwd, buffer);
   }
 
   for(i=1; i<strlen(path)+1; i++){

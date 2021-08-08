@@ -42,12 +42,12 @@ void separateCommand(char *command, int *argc, char argv[][TOKENLEN]){
   > Regresa -1 si no se encontró el comando
 
 */
-int execute(char *outputBuffer, int argc, char argv[][TOKENLEN]){
+int execute(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
   int i, retVal;
 
   for(i=0; i<COMMANDSLEN; i++){
     if(strcmp(argv[0], commands[i].name) == 0){
-      retVal = commands[i].function(outputBuffer, argc, argv);
+      retVal = commands[i].function(outputBuffer, user, argc, argv);
       return retVal;
     }
   }
@@ -62,15 +62,15 @@ int execute(char *outputBuffer, int argc, char argv[][TOKENLEN]){
   Recibe el comando completo a ejecutar, lo separa en argumentos
   y llama la función correspondiente con sus argumentos.
 */
-void executeCommand(char *outputBuffer, char *command){
+void executeCommand(char *outputBuffer, User user, char *command){
   int argc, error;
   char argv[ARG_AMMOUNT][TOKENLEN];
 
   separateCommand(command, &argc, argv);
 
-  error = execute(outputBuffer, argc, argv);
+  error = execute(outputBuffer, user, argc, argv);
   if(error == -1){
-    printf("[!] Command not found!!\n");
+    sprintf(outputBuffer, "Command \"%s\" not found", command);
   }
 
 }

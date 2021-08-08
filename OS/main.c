@@ -11,6 +11,7 @@ Equipo:
 
 #include "modules/lexer.h"
 #include "modules/filesystem.h"
+#include "modules/user.h"
 
 typedef struct PCB {
   char estado;
@@ -30,11 +31,12 @@ void roundRobin(void);
 int main(){
   char outputBuffer[2048];
   char cmd[500];
+  User rootUsr = {"root", "/"};
 
   fsInit();
 
   gets(cmd);
-  executeCommand(outputBuffer, cmd);
+  executeCommand(outputBuffer, rootUsr, cmd);
 
   printf("%s\n", outputBuffer);
 

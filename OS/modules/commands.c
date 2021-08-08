@@ -5,19 +5,20 @@
     0: Exitoso
     1: Directorio no encontrado
     2: Archivo no es un directorio
-    3: Faltan parámetros
 */
-int ls(char *outputBuffer, int argc, char argv[][TOKENLEN]){
+int ls(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
   Dir foundFile;
   iNodo dirInode;
   Dir directory[64];
 
+
+  // Si se hace ls sin argumentos, listar cwd
   if(argc < 2){
-    strcpy(outputBuffer, "Too few parameters.\nUsage:\n  ls [path]");
-    return 3;
+    foundFile = namei(user.cwd, user);
+  } else {
+    foundFile = namei(argv[1], user);
   }
 
-  foundFile = namei(argv[1]);
   if(foundFile.iNodo == -1){
     strcpy(outputBuffer, "Directory not found");
     return 1;
@@ -25,8 +26,7 @@ int ls(char *outputBuffer, int argc, char argv[][TOKENLEN]){
 
   getInode(&dirInode, foundFile.iNodo);
   if(dirInode.type != 'd'){
-    strcpy(outputBuffer, argv[1]);
-    strncat(outputBuffer, " is not a directory", 20);
+    sprintf(outputBuffer, "%s is not a directory", argv[1]);
     return 2;
   }
 

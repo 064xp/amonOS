@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS= -Wall
-OBJS =  main.c modules/lexer.c modules/filesystem.c  modules/commands.c
+OBJS =  main.c modules/lexer.c modules/filesystem.c  modules/commands.c modules/user.c
 LIBS =
 
 main: ${OBJ}

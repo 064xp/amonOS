@@ -9,6 +9,7 @@
 #include <sys/types.h>
 
 #include "globalMacros.h"
+#include "user.h"
 
 //64 bytes total
 typedef struct iNodo {
@@ -40,8 +41,8 @@ void crearRaiz(Dir *bloque, iNodo listaInodos[][16]);
 int load(char SB[2048], iNodo LI[][16]);
 void format(char superBlock[2048], iNodo LI[][16], Dir *root);
 void list(char *outputBuffer, Dir directorio[64]);
-void create(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL,char isDir);
-Dir namei(char *path);
+void create(char *fileName, User user, char isDir);
+Dir namei(char *path, User user);
 int getBlock(void *destination, int block);
 int getInode(iNodo *destination, int inodo);
 void prepend(char* s, const char* t);
