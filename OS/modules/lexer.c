@@ -1,9 +1,9 @@
 #include "lexer.h"
 
-typedef struct command {
-  char name[TOKENLEN];
-  int (*function)(int, char[][TOKENLEN]);
-} Command;
+// Lista de comandos
+Command commands [COMMANDSLEN] = {
+  {"ls", &ls}
+};
 
 /*
   Separa el comando en cada espacio.
@@ -42,13 +42,12 @@ void separateCommand(char *command, int *argc, char argv[][TOKENLEN]){
   > Regresa -1 si no se encontró el comando
 
 */
-int execute(int argc, char argv[][TOKENLEN]){
+int execute(char *outputBuffer, int argc, char argv[][TOKENLEN]){
   int i, retVal;
-  Command commands [COMMANDSLEN] = {};
 
   for(i=0; i<COMMANDSLEN; i++){
     if(strcmp(argv[0], commands[i].name) == 0){
-      retVal = commands[i].function(argc, argv);
+      retVal = commands[i].function(outputBuffer, argc, argv);
       return retVal;
     }
   }
@@ -63,13 +62,13 @@ int execute(int argc, char argv[][TOKENLEN]){
   Recibe el comando completo a ejecutar, lo separa en argumentos
   y llama la función correspondiente con sus argumentos.
 */
-void executeCommand(char *command){
+void executeCommand(char *outputBuffer, char *command){
   int argc, error;
   char argv[ARG_AMMOUNT][TOKENLEN];
 
   separateCommand(command, &argc, argv);
 
-  error = execute(argc, argv);
+  error = execute(outputBuffer, argc, argv);
   if(error == -1){
     printf("[!] Command not found!!\n");
   }

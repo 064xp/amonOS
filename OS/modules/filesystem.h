@@ -1,3 +1,6 @@
+#ifndef FS_H
+#define FS_H
+
 #include <stdio.h>
 #include <time.h>
 #include <fcntl.h>
@@ -5,8 +8,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-// Cantidad total de bloques en el disco
-#define TOTALBLKS 58
+#include "globalMacros.h"
 
 //64 bytes total
 typedef struct iNodo {
@@ -37,7 +39,7 @@ void initSuperBlock(char *superBlock);
 void crearRaiz(Dir *bloque, iNodo listaInodos[][16]);
 int load(char SB[2048], iNodo LI[][16]);
 void format(char superBlock[2048], iNodo LI[][16], Dir *root);
-void list(Dir directorio[64], iNodo listaInodos[][16]);
+void list(char *outputBuffer, Dir directorio[64]);
 void create(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL,char isDir);
 Dir namei(char *path);
 int getBlock(void *destination, int block);
@@ -49,3 +51,5 @@ int enqueue(FreeQueue *queue, int newVal);
 int dequeue(FreeQueue *queue);
 time_t getCurrentTime();
 void prepend(char* s, const char* t);
+
+#endif

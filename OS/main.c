@@ -28,7 +28,15 @@ int buscarIndice(int lista[], int pid, int len);
 void roundRobin(void);
 
 int main(){
+  char outputBuffer[2048];
+  char cmd[500];
+
   fsInit();
+
+  gets(cmd);
+  executeCommand(outputBuffer, cmd);
+
+  printf("%s\n", outputBuffer);
 
   // while(opc != -1){
   //   opc = menu();

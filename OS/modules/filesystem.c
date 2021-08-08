@@ -140,28 +140,34 @@ void crearRaiz(Dir *bloque, iNodo listaInodos[][16]){
   memcpy(&listaInodos[0][1], &inodoRaiz, sizeof(iNodo));
 }
 
-void list(Dir directorio[64], iNodo listaInodos[5][16]){
-  int i, iNodo;
+void list(char *outputBuffer, Dir directorio[64]){
+  int i, inode;
+  iNodo curFileInode;
+  char tmpBuff[500];
 
+  strcpy(outputBuffer, "");
   for(i=0; i<64; i++){
-    iNodo = directorio[i].iNodo;
-    if(iNodo != 0){
-      printf(" %i\t%c%c%c%c%c%c%c\t%i\t%s\t%i\t%i\t%s\n",
-          iNodo,
-          listaInodos[iNodo/16][(iNodo%16)-1].type,
-          listaInodos[iNodo/16][(iNodo%16)-1].perms[0],
-          listaInodos[iNodo/16][(iNodo%16)-1].perms[1],
-          listaInodos[iNodo/16][(iNodo%16)-1].perms[2],
-          listaInodos[iNodo/16][(iNodo%16)-1].perms[3],
-          listaInodos[iNodo/16][(iNodo%16)-1].perms[4],
-          listaInodos[iNodo/16][(iNodo%16)-1].perms[5],
-          listaInodos[iNodo/16][(iNodo%16)-1].links,
-          listaInodos[iNodo/16][(iNodo%16)-1].owner,
-          listaInodos[iNodo/16][(iNodo%16)-1].size,
-          listaInodos[iNodo/16][(iNodo%16)-1].lastModified,
+    inode = directorio[i].iNodo;
+    getInode(&curFileInode, inode);
+    if(inode != 0){
+      sprintf(tmpBuff, " %i\t%c%c%c%c%c%c%c\t%i\t%s\t%i\t%i\t%s\n",
+          inode,
+          curFileInode.type,
+          curFileInode.perms[0],
+          curFileInode.perms[1],
+          curFileInode.perms[2],
+          curFileInode.perms[3],
+          curFileInode.perms[4],
+          curFileInode.perms[5],
+          curFileInode.links,
+          curFileInode.owner,
+          curFileInode.size,
+          curFileInode.lastModified,
           directorio[i].nombre
       );
     }
+    strncat(outputBuffer, tmpBuff, strlen(tmpBuff));
+    strcpy(tmpBuff, "");
   }
 }
 
@@ -312,14 +318,17 @@ int getBlock(void *destination, int block){
 }
 
 Dir namei(char *path){
-  Dir file;
+  Dir file = {-1, ""};
   Dir curDir[64];
   iNodo curInode;
   char buffer[100], search = 0;
   int i, j, cnt = 0;
 
   //comenzamos en dir raiz
-  getBlock(curDir, 9);
+  if(getBlock(curDir, 9) == -1){
+    printf("Error getBlock\n");
+    return file;
+  }
 
   if(strcmp(path, "/") == 0){
     return curDir[0];
@@ -359,6 +368,12 @@ Dir namei(char *path){
     }
     cnt++;
   }
+
+  // Si no se encontró el archivo
+  if(strcmp(file.nombre, buffer) != 0){
+    file.iNodo = -1;
+  }
+
   return file;
 }
 
