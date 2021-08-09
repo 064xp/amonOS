@@ -3,7 +3,8 @@
 // Lista de comandos
 Command commands [COMMANDSLEN] = {
   {"ls", &ls},
-  {"touch", &touch}
+  {"touch", &touch},
+  {"mkdir", &mkdir}
 };
 
 /*

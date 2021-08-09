@@ -40,7 +40,7 @@ void fillLBL(char *superBlock){
 
   for(i=0; i<2048; i++){
     if(superBlock[i] == 0){
-      enqueue(&LBL, i);
+      enqueue(&LBL, i+1);
     }
     if(LBL.size == LBL.capacity) return;
   }
@@ -49,12 +49,11 @@ void fillLBL(char *superBlock){
 void initINodeList(iNodo *iNodeList){
   int i;
 
-
   for(i=0; i<80; i++){
     iNodeList[i].type = 0;
   }
 
-  iNodeList[0].type = 0;
+  iNodeList[0].type = 1; // reservado
 }
 
 /*
