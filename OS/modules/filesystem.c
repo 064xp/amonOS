@@ -5,7 +5,7 @@ FreeQueue LBL = {{}, 0, -1, 256, 0};
 
 void fsInit(){
   char super[2048];
-  iNodo listaInodos[5][16];
+  iNodo listaInodos[80]; // 5 bloques de 16 inodos
   Dir root[64];
 
   if(load(super, listaInodos) == -1){
@@ -22,18 +22,16 @@ void fsInit(){
   fillLBL(super);
 }
 
-void fillLIL(iNodo listaInodos[][16]){
-  int i, j;
+void fillLIL(iNodo listaInodos[16]){
+  int i;
 
-  for(i=0; i<5; i++){
-    for(j=0; j<16; j++){
-      if(listaInodos[i][j].type == 0){
-        // Enqueue número de I nodo
-        enqueue(&LIL, (16*i) + (j+1));
-      }
-      if(LIL.size == LIL.capacity)
-        return;
+  for(i=0; i<80; i++){
+    if(listaInodos[i].type == 0){
+      // Enqueue número de I nodo
+      enqueue(&LIL, i+1);
     }
+    if(LIL.size == LIL.capacity)
+      return;
   }
 }
 
@@ -48,16 +46,15 @@ void fillLBL(char *superBlock){
   }
 }
 
-void initINodeList(iNodo iNodeList[][16]){
-  int i, j;
+void initINodeList(iNodo *iNodeList){
+  int i;
 
-  for(i=0; i<5; i++){
-    for(j=0; j<16; j++){
-      iNodeList[i][j].type = 0;
-    }
+
+  for(i=0; i<80; i++){
+    iNodeList[i].type = 0;
   }
 
-  iNodeList[0][0].type = '-';
+  iNodeList[0].type = 0;
 }
 
 /*
@@ -68,16 +65,24 @@ void initINodeList(iNodo iNodeList[][16]){
 void initSuperBlock(char *superBlock){
   int i;
 
+  // Primeros 9 bloques ocupados
+  for(i=0; i<10; i++){
+    superBlock[i] = 1;
+  }
+
+  // El resto libres
   for(i=10; i<TOTALBLKS; i++){
     superBlock[i] = 0;
   }
 
+  // Queda mas espacio en el super bloque, pero ya
+  // no hay mas bloques disponibles
   for(i=TOTALBLKS; i<2048; i++){
     superBlock[i] = 1;
   }
 }
 
-void format(char superBlock[2048], iNodo LI[][16], Dir *root){
+void format(char superBlock[2048], iNodo *LI, Dir *root){
     //bloques
     // 1024 - 8 = 1016 bloques restantes
     // 4 + 12 = 16 bytes/archivo (struct dir)
@@ -101,7 +106,7 @@ void format(char superBlock[2048], iNodo LI[][16], Dir *root){
     close(fd);
 }
 
-int load(char SB[2048], iNodo LI[][16]){
+int load(char SB[2048], iNodo *LI){
   int fd;
   fd = open("Fs", O_RDONLY);
   if (fd==-1){
@@ -117,7 +122,7 @@ int load(char SB[2048], iNodo LI[][16]){
   return 0;
 }
 
-void crearRaiz(Dir *bloque, iNodo listaInodos[][16]){
+void crearRaiz(Dir *bloque, iNodo *listaInodos){
   int i;
   Dir root[64] = {
     {2, "."}, //Numero de I Nodo, nombre dir
@@ -137,7 +142,7 @@ void crearRaiz(Dir *bloque, iNodo listaInodos[][16]){
     root[i].iNodo = 0;
   }
   memcpy(bloque, root, sizeof(Dir) * 64);
-  memcpy(&listaInodos[0][1], &inodoRaiz, sizeof(iNodo));
+  memcpy(&listaInodos[1], &inodoRaiz, sizeof(iNodo));
 }
 
 void list(char *outputBuffer, Dir directorio[64]){
@@ -171,66 +176,144 @@ void list(char *outputBuffer, Dir directorio[64]){
   }
 }
 
-void create(char *fileName, User user, char isDir){
-  char nombre[12], contenido[1008];
-  int i, j;
+/*
+  Obtiene un inodo de la LIL
+    Si se vacía, intenta rellenarla otra vez
+*/
+int iget(){
+  int inodeNum;
+  iNodo listaInodos[80];
+  // dequeue an inode from LIL
+  if((inodeNum = dequeue(&LIL)) == -1){
+    int fd;
+    fd = open("Fs", O_RDONLY);
+    if (fd==-1){
+        perror("");
+        return -1;
+    }
+
+    lseek(fd, 3072, SEEK_SET);
+    read(fd, listaInodos, sizeof(iNodo)*5*16);
+    close(fd);
+
+    fillLIL(listaInodos);
+
+    if(LIL.size == 0){
+      return -1;
+    }
+  }
+
+  return inodeNum;
+}
+
+int blkget(){
+  int blkNum;
+  char super[2048];
+  // dequeue an inode from LBL
+  if((blkNum = dequeue(&LBL)) == -1){
+    int fd;
+    fd = open("Fs", O_RDONLY);
+    if (fd==-1){
+        perror("");
+        return -1;
+    }
+
+    lseek(fd, 1024, SEEK_SET);
+    read(fd, super, 2048);
+    close(fd);
+
+    fillLBL((char *)&super);
+
+    if(LBL.size == 0){
+      return -1;
+    }
+  }
+
+  return blkNum;
+}
+
+/*
+  Crear archivo o directorio
+
+  TODO:
+    - Validar si ya no hay mas espacio en el bloque del
+      directorio padre y conseguir otro bloque
+*/
+int create(char *fileName, Dir parent, User user, char isDir){
+  int i, j, inode, block;
   Dir tmpDir[64]; //1024 bytes
-  // Dir *root = (Dir *) datos[0];
-
-  // if(isDir){
-  //   strcpy(tmpDir[0].nombre, ".");
-  //   tmpDir[0].iNodo = LIL[*indiceLIL];
-  //   strcpy(tmpDir[1].nombre, "..");
-  //   tmpDir[1].iNodo = 2;
-  //
-  //   for(i=2; i<64; i++){
-  //     tmpDir[i].iNodo = 0;
-  //   }
-  // } else {
-  //   printf("Nombre del Archivo:\n");
-  //   scanf("%s", nombre);
-  //   printf("Contenido del Archivo:\n");
-  //   scanf("%s", contenido);
-  // }
+  iNodo parentInode, newInode;
+  Dir parentDir[64];
 
 
-  // for(i=0; i<64; i++){
-  //   if(root[i].iNodo == 0){
-  //     for(j=0; j<9; j++){
-  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].contentTable[j] = 0;
-  //     }
-  //     if(isDir){
-  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].type = 'd';
-  //       strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].perms, "rwxr--");
-  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].size = 1024;
-  //     } else {
-  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].type = '-';
-  //       strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].perms, "rw-r--");
-  //       listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].size = strlen(contenido);
-  //     }
-  //
-  //     listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].links = 1;
-  //     strcpy(listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].owner, "paulo");
-  //     listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].lastModified = 2222;
-  //     listaInodos[LIL[*indiceLIL]/16][(LIL[*indiceLIL] % 16)-1].contentTable[0] = LBL[*indiceLBL];
-  //
-  //     // -9 ya que hay 9 bloques ocupados inicialmente
-  //     // datos comienza desde el bloque 8 + 1 bloque del directorio raiz
-  //     if(isDir){
-  //       memcpy(datos[LBL[*indiceLBL]-9], tmpDir, sizeof(Dir) * 64);
-  //     } else {
-  //       strcpy(datos[LBL[*indiceLBL]-9], contenido);
-  //     }
-  //
-  //     root[i].iNodo = LIL[*indiceLIL];
-  //     strcpy(root[i].nombre, nombre);
-  //
-  //     (*indiceLIL)++;
-  //     (*indiceLBL)++;
-  //
-  //     break;
-  //   } //fin if
-  // } //fin for
+  //TODO: check perms
+
+  if(parent.iNodo == -1){
+    return 1;
+  }
+
+  inode = iget();
+  if(inode == -1)
+    return 1;
+
+  block = blkget();
+  if(block == -1)
+    return 1;
+
+  printf("new i node %i\nnew block %i\n", inode, block);
+
+  getInode(&parentInode, parent.iNodo);
+  getBlock(&parentDir, parentInode.contentTable[0]);
+
+  strcpy(tmpDir[0].nombre, ".");
+  tmpDir[0].iNodo = inode;
+  strcpy(tmpDir[1].nombre, "..");
+  tmpDir[1].iNodo = parent.iNodo;
+
+  if(isDir){
+    for(i=2; i<64; i++){
+      tmpDir[i].iNodo = 0;
+    }
+  }
+
+  for(i=0; i<64; i++){
+    if(parentDir[i].iNodo == 0){
+      for(j=0; j<9; j++){
+        newInode.contentTable[j] = 0;
+      }
+
+      if(isDir){
+        newInode.type = 'd';
+        strcpy(newInode.perms, "rwxr--");
+        newInode.size = 1024;
+      } else {
+        newInode.type = '-';
+        strcpy(newInode.perms, "rw-r--");
+        newInode.size = 0;
+      }
+
+      newInode.links = 1;
+      strcpy(newInode.owner, user.name);
+      newInode.lastModified = getCurrentTime();
+      newInode.contentTable[0] = block;
+
+      // Escribir bloque e I Nodo del nuevo archivo/directorio
+      if(isDir){
+        writeBlock(tmpDir, block, sizeof(Dir)*64);
+      }
+      writeInode(&newInode, inode);
+      // Actualizar superbloque para marcar al bloque como ocupado
+      updateSuperblock(block, 1);
+
+      // Registrar el nuevo archivo en el directorio padre
+      parentDir[i].iNodo = inode;
+      strcpy(parentDir[i].nombre, fileName);
+      writeBlock(parentDir, parentInode.contentTable[0], sizeof(Dir)*64);
+
+      break;
+    } //fin if
+  } //fin for
+  return 0;
 }
 
 int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL){
@@ -276,7 +359,7 @@ int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indi
   return 0;
 }
 
-int getInode(iNodo *destination, int inodo){
+int getInode(iNodo *destination, int inode){
   int fd;
   fd = open("Fs", O_RDONLY);
   if (fd==-1){
@@ -284,8 +367,23 @@ int getInode(iNodo *destination, int inodo){
       return -1;
   }
 
-  lseek(fd, (3072) + ((inodo-1) * sizeof(iNodo)), SEEK_SET);
+  lseek(fd, (3072) + ((inode-1) * sizeof(iNodo)), SEEK_SET);
   read(fd, destination, sizeof(iNodo));
+  close(fd);
+
+  return 0;
+}
+
+int writeInode(iNodo *newInode, int inodeNum){
+  int fd;
+  fd = open("Fs", O_WRONLY);
+  if (fd==-1){
+      perror("");
+      return -1;
+  }
+
+  lseek(fd, (3072) + ((inodeNum-1) * sizeof(iNodo)), SEEK_SET);
+  write(fd, newInode, sizeof(iNodo));
   close(fd);
 
   return 0;
@@ -306,7 +404,38 @@ int getBlock(void *destination, int block){
   return 0;
 }
 
-Dir namei(char *path, User user){
+int writeBlock(void *buffer, int block, size_t size){
+  int fd;
+  fd = open("Fs", O_WRONLY);
+  if (fd==-1){
+      perror("");
+      return -1;
+  }
+
+  lseek(fd, 1024 * (block -1), SEEK_SET);
+  write(fd, buffer, size);
+  close(fd);
+
+  return 0;
+}
+
+int updateSuperblock(int block, char status){
+  int fd;
+  fd = open("Fs", O_WRONLY);
+  if (fd==-1){
+      perror("");
+      return -1;
+  }
+
+  lseek(fd, 1024 + block, SEEK_SET);
+  write(fd, &status, 1);
+  close(fd);
+
+  return 0;
+
+}
+
+Dir namei(char *path, char *cwd){
   Dir file = {-1, ""};
   Dir curDir[64];
   iNodo curInode;
@@ -325,7 +454,7 @@ Dir namei(char *path, User user){
 
   if(path[0] != '/'){
     strcpy(buffer, path);
-    sprintf(path, "%s%s", user.cwd, buffer);
+    sprintf(path, "%s%s", cwd, buffer);
   }
 
   for(i=1; i<strlen(path)+1; i++){
@@ -369,6 +498,36 @@ Dir namei(char *path, User user){
   }
 
   return file;
+}
+
+/*
+  Toma una ruta y separa entre la ruta del padre y
+  el nombre del archivo
+
+  ej.
+  /padre/archivo
+  parent = /padre
+  file = archivo
+*/
+void separeParentPath(char *fullPath, char *parent, char *file){
+  int i, len = strlen(fullPath);
+
+  if(fullPath[len-1] == '/')
+    i = len -2;
+  else
+    i = len -1;
+
+  for(; i>=0; i--){
+    if(fullPath[i] == '/')
+      break;
+  }
+  i++;
+
+  strcpy(file, fullPath+i);
+  if(i == 0)
+    strcpy(parent, "/");
+  else
+    memcpy(parent, fullPath, i);
 }
 
 

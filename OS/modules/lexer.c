@@ -2,7 +2,8 @@
 
 // Lista de comandos
 Command commands [COMMANDSLEN] = {
-  {"ls", &ls}
+  {"ls", &ls},
+  {"touch", &touch}
 };
 
 /*
@@ -19,6 +20,7 @@ Command commands [COMMANDSLEN] = {
 void separateCommand(char *command, int *argc, char argv[][TOKENLEN]){
   int i, count = 0;
 
+  trim(command);
   *argc = 0;
   for(i=0; i<=strlen(command); i++){
     if(command[i] == ' ' || command[i] == '\0'){
@@ -73,4 +75,35 @@ void executeCommand(char *outputBuffer, User user, char *command){
     sprintf(outputBuffer, "Command \"%s\" not found", command);
   }
 
+}
+
+/*
+  Quita espacios al principio y al final de la cadena
+*/
+void trim(char *buffer){
+  int i, counter = 0, len = strlen(buffer);
+  char *temp = malloc(len);
+
+  // Quitar espacios de el inicio
+  for(i=0; i<len; i++){
+    if(buffer[i] == ' ')
+      counter++;
+    else
+      break;
+  }
+
+  strcpy(buffer, buffer+i);
+
+  // Quitar espacios del final
+  len = strlen(buffer);
+  counter = 0;
+  for(i=len-1; i>=0; i--){
+    if(buffer[i] == ' ')
+      counter++;
+    else
+      break;
+  }
+  memcpy(temp, buffer, len-counter);
+  strcpy(buffer, temp);
+  free(temp);
 }

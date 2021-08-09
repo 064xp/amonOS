@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "globalMacros.h"
 #include "commands.h"
@@ -17,5 +18,6 @@ typedef struct command {
 void separateCommand(char *command, int *argc, char argv[][TOKENLEN]);
 int execute(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]);
 void executeCommand(char *outputBuffer, User user, char *command);
+void trim(char *buffer);
 
 #endif
