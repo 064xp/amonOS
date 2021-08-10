@@ -36,7 +36,7 @@ int main(){
   fsInit();
 
   gets(cmd);
-  executeCommand(outputBuffer, rootUsr, cmd);
+  executeCommand(outputBuffer, &rootUsr, cmd);
   printf("%s\n", outputBuffer);
 
   // while(opc != -1){

@@ -5,7 +5,8 @@ Command commands [COMMANDSLEN] = {
   {"ls", &ls},
   {"touch", &touch},
   {"mkdir", &mkdir},
-  {"rm", &rm}
+  {"rm", &rm},
+  {"cd", &cd},
 };
 
 /*
@@ -46,7 +47,7 @@ void separateCommand(char *command, int *argc, char argv[][TOKENLEN]){
   > Regresa -1 si no se encontró el comando
 
 */
-int execute(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
+int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   int i, retVal;
 
   for(i=0; i<COMMANDSLEN; i++){
@@ -66,7 +67,7 @@ int execute(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
   Recibe el comando completo a ejecutar, lo separa en argumentos
   y llama la función correspondiente con sus argumentos.
 */
-void executeCommand(char *outputBuffer, User user, char *command){
+void executeCommand(char *outputBuffer, User *user, char *command){
   int argc, error;
   char argv[ARG_AMMOUNT][TOKENLEN];
 
@@ -135,7 +136,7 @@ void separeParentPath(char *fullPath, char *parent, char *file){
 
   if(file != NULL)
     strcpy(file, fullPath+i);
-    
+
   if(i == 0)
     strcpy(parent, "");
   else{
