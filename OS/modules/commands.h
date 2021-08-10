@@ -2,6 +2,7 @@
 #define COMMANDS_H
 
 #include "filesystem.h"
+#include "lexer.h"
 #include "user.h"
 
 int ls(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]);

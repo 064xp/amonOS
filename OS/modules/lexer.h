@@ -19,5 +19,7 @@ void separateCommand(char *command, int *argc, char argv[][TOKENLEN]);
 int execute(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]);
 void executeCommand(char *outputBuffer, User user, char *command);
 void trim(char *buffer);
+void separeParentPath(char *fullPath, char *parent, char *file);
+void prepend(char* s, const char* t);
 
 #endif

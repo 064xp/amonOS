@@ -451,27 +451,12 @@ Dir namei(char *path, char *cwd){
     return curDir[0];
   }
 
+  // Si no es una ruta absoluta, agregar el CWD antes
   if(path[0] != '/'){
-    strcpy(buffer, path);
-    sprintf(path, "%s%s", cwd, buffer);
+    prepend(path, cwd);
   }
 
-  for(i=1; i<strlen(path)+1; i++){
-    if(search){
-      //buscar archivo con el nombre actual en el directorio
-      search = 0;
-      for(j=0; j<64; j++){
-        if(curDir[j].nombre[0] == '\0'){
-          break;
-        } else if(strcmp(curDir[j].nombre, buffer) == 0){
-          file = curDir[j];
-          getInode(&curInode, file.iNodo);
-          getBlock(curDir, curInode.contentTable[0]);
-          break;
-        }
-      }
-    }
-
+  for(i=1; i<strlen(path); i++){
     // Separamos en los espacios, en las diagonales, o
     // si es final de cadena
 
@@ -488,6 +473,23 @@ Dir namei(char *path, char *cwd){
     } else {
       buffer[cnt] = path[i];
     }
+
+    if(search){
+      //buscar archivo con el nombre actual en el directorio
+      cnt = 0;
+      search = 0;
+      for(j=0; j<64; j++){
+        if(curDir[j].nombre[0] == '\0'){
+          break;
+        } else if(strcmp(curDir[j].nombre, buffer) == 0){
+          file = curDir[j];
+          getInode(&curInode, file.iNodo);
+          getBlock(curDir, curInode.contentTable[0]);
+          break;
+        }
+      }
+    }
+
     cnt++;
   }
 
@@ -497,36 +499,6 @@ Dir namei(char *path, char *cwd){
   }
 
   return file;
-}
-
-/*
-  Toma una ruta y separa entre la ruta del padre y
-  el nombre del archivo
-
-  ej.
-  /padre/archivo
-  parent = /padre
-  file = archivo
-*/
-void separeParentPath(char *fullPath, char *parent, char *file){
-  int i, len = strlen(fullPath);
-
-  if(fullPath[len-1] == '/')
-    i = len -2;
-  else
-    i = len -1;
-
-  for(; i>=0; i--){
-    if(fullPath[i] == '/')
-      break;
-  }
-  i++;
-
-  strcpy(file, fullPath+i);
-  if(i == 0)
-    strcpy(parent, "/");
-  else
-    memcpy(parent, fullPath, i);
 }
 
 
@@ -566,11 +538,4 @@ time_t getCurrentTime(){
   secs  = spec.tv_sec;
 
   return secs;
-}
-
-
-void prepend(char* s, const char* t){
-    size_t len = strlen(t);
-    memmove(s + len, s, strlen(s) + 1);
-    memcpy(s, t, len);
 }

@@ -108,3 +108,41 @@ void trim(char *buffer){
   strcpy(buffer, temp);
   free(temp);
 }
+
+/*
+  Toma una ruta y separa entre la ruta del padre y
+  el nombre del archivo
+
+  ej.
+  /padre/archivo
+  parent = /padre
+  file = archivo
+*/
+void separeParentPath(char *fullPath, char *parent, char *file){
+  int i, len = strlen(fullPath);
+
+  if(fullPath[len-1] == '/')
+    i = len -2;
+  else
+    i = len -1;
+
+  for(; i>=0; i--){
+    if(fullPath[i] == '/')
+      break;
+  }
+  i++;
+
+  strcpy(file, fullPath+i);
+  if(i == 0)
+    strcpy(parent, "");
+  else{
+    memcpy(parent, fullPath, i);
+    parent[i] = '\0';
+  }
+}
+
+void prepend(char* s, const char* t){
+    size_t len = strlen(t);
+    memmove(s + len, s, strlen(s) + 1);
+    memcpy(s, t, len);
+}

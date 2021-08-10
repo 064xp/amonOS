@@ -50,7 +50,8 @@ int touch(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
   separeParentPath(argv[1], parentPath, fileName);
   if(strlen(parentPath) == 0)
     strcpy(parentPath, user.cwd);
-  parent = namei(parentPath, NULL);
+
+  parent = namei(parentPath, user.cwd);
   if(parent.iNodo == -1){
     strcpy(outputBuffer, "Invalid file location");
     return 1;
@@ -78,7 +79,8 @@ int mkdir(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
   separeParentPath(argv[1], parentPath, dirName);
   if(strlen(parentPath) == 0)
     strcpy(parentPath, user.cwd);
-  parent = namei(parentPath, NULL);
+
+  parent = namei(parentPath, user.cwd);
   if(parent.iNodo == -1){
     strcpy(outputBuffer, "Invalid file location");
     return 1;

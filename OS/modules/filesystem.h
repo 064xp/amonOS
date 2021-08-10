@@ -9,6 +9,7 @@
 #include <sys/types.h>
 
 #include "globalMacros.h"
+#include "lexer.h"
 #include "user.h"
 
 //64 bytes total
@@ -49,12 +50,10 @@ int writeInode(iNodo *newInode, int inodeNum);
 int writeBlock(void *buffer, int block, size_t size);
 void prepend(char* s, const char* t);
 int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL);
-void separeParentPath(char *fullPath, char *parent, char *file);
 int updateSuperblock(int block, char status);
 
 int enqueue(FreeQueue *queue, int newVal);
 int dequeue(FreeQueue *queue);
 time_t getCurrentTime();
-void prepend(char* s, const char* t);
 
 #endif
