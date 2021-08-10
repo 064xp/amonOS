@@ -65,7 +65,7 @@ void initSuperBlock(char *superBlock){
   int i;
 
   // Primeros 9 bloques ocupados
-  for(i=0; i<10; i++){
+  for(i=0; i<9; i++){
     superBlock[i] = 1;
   }
 
@@ -243,7 +243,6 @@ int create(char *fileName, Dir parent, User user, char isDir){
   Dir tmpDir[64]; //1024 bytes
   iNodo parentInode, newInode;
   Dir parentDir[64];
-
 
   //TODO: check perms
 
@@ -426,7 +425,7 @@ int updateSuperblock(int block, char status){
       return -1;
   }
 
-  lseek(fd, 1024 + block, SEEK_SET);
+  lseek(fd, 1024 + block-1, SEEK_SET);
   write(fd, &status, 1);
   close(fd);
 

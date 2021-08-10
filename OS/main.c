@@ -37,8 +37,8 @@ int main(){
 
   gets(cmd);
   executeCommand(outputBuffer, rootUsr, cmd);
-
   printf("%s\n", outputBuffer);
+
   // while(opc != -1){
   //   opc = menu();
   //   switch(opc){
