@@ -35,8 +35,12 @@ int main(){
 
   fsInit();
 
-  gets(cmd);
+  // gets(cmd);
+  strcpy(cmd, "cd dir1");
   executeCommand(outputBuffer, &rootUsr, cmd);
+  strcpy(cmd, "pwd");
+  executeCommand(outputBuffer, &rootUsr, cmd);
+  // executeCommand(outputBuffer, &rootUsr, "pwd");
   printf("%s\n", outputBuffer);
 
   // while(opc != -1){

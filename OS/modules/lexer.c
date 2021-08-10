@@ -7,6 +7,7 @@ Command commands [COMMANDSLEN] = {
   {"mkdir", &mkdir},
   {"rm", &rm},
   {"cd", &cd},
+  {"pwd", &pwd}
 };
 
 /*
@@ -106,7 +107,7 @@ void trim(char *buffer){
     else
       break;
   }
-  memcpy(temp, buffer, len-counter);
+  memcpy(temp, buffer, len-(counter-1));
   strcpy(buffer, temp);
   free(temp);
 }

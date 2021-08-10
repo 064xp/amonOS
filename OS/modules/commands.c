@@ -158,5 +158,11 @@ int cd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   } else {
     strcpy(user->cwd, argv[1]);
   }
+  strcpy(outputBuffer, "");
+  return 0;
+}
+
+int pwd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+  strcpy(outputBuffer, user->cwd);
   return 0;
 }

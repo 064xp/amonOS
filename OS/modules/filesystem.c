@@ -20,15 +20,6 @@ void fsInit(){
 
   fillLIL(listaInodos);
   fillLBL(super);
-
-  // int i;
-  // for(i=0; i<LIL.size; i++){
-  printf("Inode: %i\n", LIL.list[0]);
-  // }
-  //
-  // for(i=0; i<LBL.size; i++){
-  printf("Block: %i\n", LBL.list[0]);
-  // }
 }
 
 int fillLIL(iNodo *listaInodos){
