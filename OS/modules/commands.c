@@ -95,3 +95,46 @@ int mkdir(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
   return 0;
 
 }
+
+int rm(char *outputBuffer, User user, int argc, char argv[][TOKENLEN]){
+  char parentPath[TOKENLEN];
+  Dir file, parent;
+  iNodo fileInode;
+
+  if(argc < 2){
+    strcpy(outputBuffer, "Missing arguments.\nUsage:\n\trm [fileName]");
+    return 1;
+  }
+
+  file = namei(argv[1], user.cwd);
+  if(file.iNodo == -1){
+    sprintf(outputBuffer, "File \"%s\" not found", argv[1]);
+    return 1;
+  }
+  getInode(&fileInode, file.iNodo);
+
+  // Aun no esta implementado el eliminado recursivo de directorios
+  if(fileInode.type == 'd'){
+    strcpy(outputBuffer, "Deletion of directories is not yet implemented");
+    return 1;
+  }
+
+  separeParentPath(argv[1], parentPath, NULL);
+  if(strlen(parentPath) == 0)
+    strcpy(parentPath, user.cwd);
+
+  parent = namei(parentPath, user.cwd);
+
+  if(parent.iNodo == -1){
+    strcpy(outputBuffer, "Invalid file location");
+    return 1;
+  }
+
+  if(delete(file, parent, user, 0)){
+    strcpy(outputBuffer, "An error ocurred while deleting the file");
+    return 1;
+  }
+
+  sprintf(outputBuffer, "File \"%s\" deleted succesfullly", argv[1]);
+  return 0;
+}

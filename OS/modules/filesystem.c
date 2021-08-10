@@ -20,10 +20,34 @@ void fsInit(){
 
   fillLIL(listaInodos);
   fillLBL(super);
+
+  // int i;
+  // for(i=0; i<LIL.size; i++){
+  printf("Inode: %i\n", LIL.list[0]);
+  // }
+  //
+  // for(i=0; i<LBL.size; i++){
+  printf("Block: %i\n", LBL.list[0]);
+  // }
 }
 
-void fillLIL(iNodo listaInodos[16]){
-  int i;
+int fillLIL(iNodo *listaInodos){
+  int i, fd;
+  iNodo listaInodosDisco[80];
+
+  if(listaInodos == NULL){
+    fd = open("Fs", O_RDONLY);
+    if (fd==-1){
+        perror("");
+        return -1;
+    }
+
+    lseek(fd, 3072, SEEK_SET);
+    read(fd, listaInodosDisco, sizeof(iNodo)*5*16);
+    close(fd);
+
+    listaInodos = listaInodosDisco;
+  }
 
   for(i=0; i<80; i++){
     if(listaInodos[i].type == 0){
@@ -31,19 +55,36 @@ void fillLIL(iNodo listaInodos[16]){
       enqueue(&LIL, i+1);
     }
     if(LIL.size == LIL.capacity)
-      return;
+      return 0;
   }
+  return 0;
 }
 
-void fillLBL(char *superBlock){
-  int i;
+int fillLBL(char *superBlock){
+  int i, fd;
+  char superDisco[2048];
+
+  if(superBlock == NULL){
+    fd = open("Fs", O_RDONLY);
+    if (fd==-1){
+        perror("");
+        return -1;
+    }
+
+    lseek(fd, 3072, SEEK_SET);
+    read(fd, superDisco, 2048);
+    close(fd);
+
+    superBlock = superDisco;
+  }
 
   for(i=0; i<2048; i++){
     if(superBlock[i] == 0){
       enqueue(&LBL, i+1);
     }
-    if(LBL.size == LBL.capacity) return;
+    if(LBL.size == LBL.capacity) return 0;
   }
+  return 0;
 }
 
 void initINodeList(iNodo *iNodeList){
@@ -181,21 +222,9 @@ void list(char *outputBuffer, Dir directorio[64]){
 */
 int iget(){
   int inodeNum;
-  iNodo listaInodos[80];
   // dequeue an inode from LIL
   if((inodeNum = dequeue(&LIL)) == -1){
-    int fd;
-    fd = open("Fs", O_RDONLY);
-    if (fd==-1){
-        perror("");
-        return -1;
-    }
-
-    lseek(fd, 3072, SEEK_SET);
-    read(fd, listaInodos, sizeof(iNodo)*5*16);
-    close(fd);
-
-    fillLIL(listaInodos);
+    fillLIL(NULL);
 
     if(LIL.size == 0){
       return -1;
@@ -207,21 +236,9 @@ int iget(){
 
 int blkget(){
   int blkNum;
-  char super[2048];
   // dequeue an inode from LBL
   if((blkNum = dequeue(&LBL)) == -1){
-    int fd;
-    fd = open("Fs", O_RDONLY);
-    if (fd==-1){
-        perror("");
-        return -1;
-    }
-
-    lseek(fd, 1024, SEEK_SET);
-    read(fd, super, 2048);
-    close(fd);
-
-    fillLBL((char *)&super);
+    fillLBL(NULL);
 
     if(LBL.size == 0){
       return -1;
@@ -229,6 +246,43 @@ int blkget(){
   }
 
   return blkNum;
+}
+
+int freeInode(int inode){
+  iNodo newInode = {
+    0, // Tipo
+    "", //Perms
+    0, //links
+    "", //Owner
+    0, //size 1kB
+    0, //Last modified
+    {} // Content table
+  };
+
+  if(writeInode(&newInode, inode) != 0)
+    return 1;
+
+  // Si ya esta llena la LIL, rellenarla entera
+  if(LIL.size == LIL.capacity){
+    fillLIL(NULL);
+  } else {
+    enqueue(&LIL, inode);
+  }
+
+  return 0;
+}
+
+int freeBlock(int block){
+  if(updateSuperblock(block, 0) != 0)
+    return 1;
+
+  // Si ya esta llena la LIL, rellenarla entera
+  if(LBL.size == LBL.capacity){
+    fillLBL(NULL);
+  } else {
+    enqueue(&LBL, block);
+  }
+  return 0;
 }
 
 /*
@@ -258,8 +312,7 @@ int create(char *fileName, Dir parent, User user, char isDir){
   if(block == -1)
     return 1;
 
-  printf("new i node %i\nnew block %i\n", inode, block);
-
+  printf("\n\nnew inode: %i, new block: %i \n\n", inode, block);
   getInode(&parentInode, parent.iNodo);
   getBlock(&parentDir, parentInode.contentTable[0]);
 
@@ -314,46 +367,39 @@ int create(char *fileName, Dir parent, User user, char isDir){
   return 0;
 }
 
-int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL){
-  // char buffer[200];
-  // iNodo *fileInode;
-  // Dir *file;
-  // int i;
-  //
-  // printf("Ingresa el nombre del archivo:\n");
-  // scanf("%s", buffer );
-  //
-  // if(strcmp(buffer, "/") == 0){
-  //   printf("No se puede borrar el directorio raiz\n");
-  //   return -1;
-  // }
-  //
-  // if(buffer[0] != '/')
-  //   prepend(buffer, "/");
-  //
-  // namei(datos, listaInodos, buffer);
-  // if(file == NULL){
-  //   printf("No se econtro el archivo\n");
-  //   return -1;
-  // }
-  //
-  // fileInode = getInode(listaInodos, file->iNodo);
-  //
-  // // Liberar bloques
-  // for(i=0; i<9; i++){
-  //   if(fileInode->contentTable[i] != 0){
-  //     (*indiceLBL)--;
-  //     LBL[*indiceLBL] = fileInode->contentTable[i];
-  //   } else {
-  //     break;
-  //   }
-  // }
-  //
-  // // Liberar el I Nodo
-  // (*indiceLIL)--;
-  // LIL[*indiceLIL] = file->iNodo;
-  // file->iNodo = 0;
-  //
+/*
+  Eliminar archivos
+
+  TODO:
+    Borrar directorios recursivamente
+*/
+int delete(Dir file, Dir parent, User user, char isDir){
+  int i;
+  iNodo parentInode, fileInode;
+  Dir parentDir[64];
+
+  //TODO: check perms
+
+  if(parent.iNodo == -1){
+    return 1;
+  }
+
+  getInode(&parentInode, parent.iNodo);
+  getInode(&fileInode, file.iNodo);
+  getBlock(&parentDir, parentInode.contentTable[0]);
+
+  // Quitarlo del directorio padre
+  for(i=0; i<64; i++){
+    if(strcmp(parentDir[i].nombre, file.nombre) == 0){
+      parentDir[i].iNodo = 0;
+      writeBlock(parentDir, parentInode.contentTable[0], sizeof(Dir)*64);
+    }
+  }
+
+  // Marcar bloque como libre
+  freeBlock(fileInode.contentTable[0]);
+  //Limpiar iNodo
+  freeInode(file.iNodo);
   return 0;
 }
 

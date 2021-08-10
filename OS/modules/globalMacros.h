@@ -3,7 +3,7 @@
 // Tamaño máximo de cada token del comando
 #define TOKENLEN 25
 // Cantidad de comandos que se tienen
-#define COMMANDSLEN 3
+#define COMMANDSLEN 4
 // Cantidad máxima de argumentos de un comando
 #define ARG_AMMOUNT 5
 // Cantidad total de bloques en el disco

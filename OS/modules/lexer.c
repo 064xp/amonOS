@@ -4,7 +4,8 @@
 Command commands [COMMANDSLEN] = {
   {"ls", &ls},
   {"touch", &touch},
-  {"mkdir", &mkdir}
+  {"mkdir", &mkdir},
+  {"rm", &rm}
 };
 
 /*
@@ -132,7 +133,9 @@ void separeParentPath(char *fullPath, char *parent, char *file){
   }
   i++;
 
-  strcpy(file, fullPath+i);
+  if(file != NULL)
+    strcpy(file, fullPath+i);
+    
   if(i == 0)
     strcpy(parent, "");
   else{

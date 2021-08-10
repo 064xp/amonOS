@@ -34,8 +34,8 @@ typedef struct freeQueue {
 } FreeQueue;
 
 void fsInit(void);
-void fillLIL(iNodo *listaInodos);
-void fillLBL(char *superBlock);
+int fillLIL(iNodo *listaInodos);
+int fillLBL(char *superBlock);
 void initINodeList(iNodo *iNodeList);
 void initSuperBlock(char *superBlock);
 void crearRaiz(Dir *bloque, iNodo *listaInodos);
@@ -49,8 +49,10 @@ int getInode(iNodo *destination, int inodo);
 int writeInode(iNodo *newInode, int inodeNum);
 int writeBlock(void *buffer, int block, size_t size);
 void prepend(char* s, const char* t);
-int delete(char datos[][1024],iNodo listaInodos[][16], int *indiceLBL, int *indiceLIL, int *LIL, int *LBL);
+int delete(Dir file, Dir parent, User user, char isDir);
 int updateSuperblock(int block, char status);
+int freeInode(int inode);
+int freeBlock(int block);
 
 int enqueue(FreeQueue *queue, int newVal);
 int dequeue(FreeQueue *queue);
