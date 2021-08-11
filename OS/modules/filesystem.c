@@ -510,6 +510,8 @@ Dir namei(char *path, char *cwd){
       buffer[cnt] = path[i];
     }
 
+    cnt++;
+
     if(search){
       //buscar archivo con el nombre actual en el directorio
       cnt = 0;
@@ -525,8 +527,6 @@ Dir namei(char *path, char *cwd){
         }
       }
     }
-
-    cnt++;
   }
 
   // Si no se encontró el archivo
@@ -537,6 +537,96 @@ Dir namei(char *path, char *cwd){
   return file;
 }
 
+int realPath(char *outputPath, char *path, char *cwd){
+  Dir file = {-1, ""};
+  Dir curDir[64];
+  iNodo curInode;
+  char buffer[100], search = 0;
+  int i, j, cnt = 0, len;
+
+  if(strcmp(path, "/") == 0){
+    strcpy(outputPath, path);
+    return 0;
+  }
+
+  // inicializamos el path con '/'
+  strcpy(outputPath, "/");
+
+  //comenzamos en dir raiz
+  if(getBlock(curDir, 9) == -1){
+    printf("Error getBlock\n");
+    return 1;
+  }
+
+  // Si no es una ruta absoluta, agregar el CWD antes
+  if(path[0] != '/'){
+    prepend(path, cwd);
+  }
+
+  for(i=1; i<strlen(path); i++){
+    // Separamos en los espacios, en las diagonales, o
+    // si es final de cadena
+
+    // Ponemos el token leido en buffer y si search = 1
+    // Busca el nombre que se tiene en el buffer en el directorio
+    // actual
+    if(path[i] == '/' || path[i] == ' ' ){
+      buffer[cnt] = '\0';
+      search = 1;
+    } else if(path[i+1] == '\0'){
+      buffer[cnt] = path[i];
+      buffer[cnt+1] = '\0';
+      search = 1;
+    } else {
+      buffer[cnt] = path[i];
+    }
+
+    cnt++;
+
+    if(search){
+      //buscar archivo con el nombre actual en el directorio
+      cnt = 0;
+      search = 0;
+
+      if(strcmp(buffer, "..") == 0){
+        len = strlen(outputPath);
+        // Quitar hasta el ultimo '/'
+        if(outputPath[len -1] == '/')
+          j = len-2;
+        else
+          j = len-1;
+
+        for(; j>=0; j--){
+          if(outputPath[j] == '/'){
+            outputPath[j+1] = '\0';
+            break;
+          }
+        }
+        // Si buffer == '.' no hacer nada, ya estamos en ese directorio
+      } else if(strcmp(buffer, ".") != 0){
+        // Si buffer != "." && buffer != "..", buscar buffer en el dir actual
+        for(j=0; j<=64; j++){
+          // si llegamos a 64, significa que no encontramos el archivo en el
+          // dir actual
+          if(j == 64){
+            return 1;
+          }
+
+          if(strcmp(curDir[j].nombre, buffer) == 0){
+            file = curDir[j];
+            strncat(outputPath, buffer, strlen(buffer));
+            strncat(outputPath, "/", 2);
+
+            getInode(&curInode, file.iNodo);
+            getBlock(curDir, curInode.contentTable[0]);
+            break;
+          }
+        } // fin for
+      } // fin if no es . o ..
+    } // fin if search
+  } // fin for cada letra del path
+  return 0;
+}
 
 // Funciones de Fila
 

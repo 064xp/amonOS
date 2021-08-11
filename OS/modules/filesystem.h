@@ -44,6 +44,7 @@ void format(char superBlock[2048], iNodo *LI, Dir *root);
 void list(char *outputBuffer, Dir directorio[64]);
 int create(char *fileName, Dir parent, User user, char isDir);
 Dir namei(char *path, char *cwd);
+int realPath(char *outputPath, char *path, char *cwd);
 int getBlock(void *destination, int block);
 int getInode(iNodo *destination, int inodo);
 int writeInode(iNodo *newInode, int inodeNum);

@@ -140,24 +140,19 @@ int rm(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
 }
 
 int cd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
-  Dir newDir;
+  char path[TOKENLEN];
 
   if(argc < 2){
     strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tcd [new directory]");
     return 1;
   }
 
-  newDir = namei(argv[1], user->cwd);
-  if(newDir.iNodo == -1){
+  if(realPath(path, argv[1], user->cwd)){
     strcpy(outputBuffer, "No such file or directory");
     return 1;
   }
 
-  if(argv[1][0] != '/'){
-    prepend(argv[1], user->cwd);
-  } else {
-    strcpy(user->cwd, argv[1]);
-  }
+  strcpy(user->cwd, path);
   strcpy(outputBuffer, "");
   return 0;
 }

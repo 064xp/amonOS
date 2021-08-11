@@ -35,13 +35,11 @@ int main(){
 
   fsInit();
 
-  // gets(cmd);
-  strcpy(cmd, "cd dir1");
-  executeCommand(outputBuffer, &rootUsr, cmd);
-  strcpy(cmd, "pwd");
-  executeCommand(outputBuffer, &rootUsr, cmd);
-  // executeCommand(outputBuffer, &rootUsr, "pwd");
-  printf("%s\n", outputBuffer);
+  while(1){
+    gets(cmd);
+    executeCommand(outputBuffer, &rootUsr, cmd);
+    printf("%s\n", outputBuffer);
+  }
 
   // while(opc != -1){
   //   opc = menu();
