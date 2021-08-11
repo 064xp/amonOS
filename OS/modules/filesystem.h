@@ -54,6 +54,7 @@ int delete(Dir file, Dir parent, User user, char isDir);
 int updateSuperblock(int block, char status);
 int freeInode(int inode);
 int freeBlock(int block);
+int fileExistsInDir(char *fileName, int parentInodeNum);
 
 int enqueue(FreeQueue *queue, int newVal);
 int dequeue(FreeQueue *queue);

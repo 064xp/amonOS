@@ -282,6 +282,10 @@ int freeBlock(int block){
   TODO:
     - Validar si ya no hay mas espacio en el bloque del
       directorio padre y conseguir otro bloque
+  Retvals
+    0: Creado exitosamente
+    1: Directorio padre no valido
+    2: Archivo ya existe
 */
 int create(char *fileName, Dir parent, User user, char isDir){
   int i, j, inode, block;
@@ -291,8 +295,14 @@ int create(char *fileName, Dir parent, User user, char isDir){
 
   //TODO: check perms
 
+
   if(parent.iNodo == -1){
     return 1;
+  }
+
+  // Checar si ya existe
+  if(fileExistsInDir(fileName, parent.iNodo)){
+    return 2;
   }
 
   inode = iget();
@@ -303,7 +313,6 @@ int create(char *fileName, Dir parent, User user, char isDir){
   if(block == -1)
     return 1;
 
-  printf("\n\nnew inode: %i, new block: %i \n\n", inode, block);
   getInode(&parentInode, parent.iNodo);
   getBlock(&parentDir, parentInode.contentTable[0]);
 
@@ -625,6 +634,22 @@ int realPath(char *outputPath, char *path, char *cwd){
       } // fin if no es . o ..
     } // fin if search
   } // fin for cada letra del path
+  return 0;
+}
+
+int fileExistsInDir(char *fileName, int parentInodeNum){
+  Dir parentDir[64];
+  iNodo parentInode;
+  int i;
+
+  getInode(&parentInode, parentInodeNum);
+  getBlock(parentDir, parentInode.contentTable[0]);
+
+  for(i=0; i<64; i++){
+    if(strcmp(parentDir[i].nombre, fileName) == 0)
+      return 1;
+  }
+
   return 0;
 }
 

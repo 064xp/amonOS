@@ -41,6 +41,7 @@ int touch(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   char fileName[12];
   char parentPath[TOKENLEN];
   Dir parent;
+  int err;
 
   if(argc < 2){
     strcpy(outputBuffer, "Missing arguments.\nUsage:\n\ttouch [fileName]");
@@ -57,8 +58,12 @@ int touch(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
     return 1;
   }
 
-  if(create(fileName, parent, *user, 0)){
+  err = create(fileName, parent, *user, 0);
+  if(err == 1){
     strcpy(outputBuffer, "An error ocurred while creating the file");
+    return 1;
+  } else if(err == 2){
+    sprintf(outputBuffer, "File \"%s\" already exists", argv[1]);
     return 1;
   }
 
