@@ -40,73 +40,7 @@ int main(){
     executeCommand(outputBuffer, &rootUsr, cmd);
     printf("%s\n", outputBuffer);
   }
-
-  // while(opc != -1){
-  //   opc = menu();
-  //   switch(opc){
-  //     case 1:
-  //       create(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL, 0);
-  //       format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
-  //       break;
-  //     case 2:
-  //       create(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL, 1);
-  //       format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
-  //       break;
-  //     case 3:
-  //       printf("\n------------------------\n\n");
-  //       printf("Listando archivos en el directorio raiz\n");
-  //       list((Dir *) datos[0], listaInodos);
-  //       printf("\n\n");
-  //       break;
-  //     case 4:
-  //       printf("Ingresa el nombre del archivo:\n");
-  //       scanf("%s", buffer);
-  //       if(buffer[0] != '/')
-  //         prepend(buffer, "/");
-  //
-  //       file = namei(datos, listaInodos, buffer);
-  //       fileInode = getInode(listaInodos, file->iNodo);
-  //
-  //       if(fileInode->type == 'd'){
-  //         printf("%s Es un directorio, listando sus archivos:\n\n", buffer);
-  //         fileDir = (Dir *) getBlock(datos, fileInode, 0);
-  //         list(fileDir, listaInodos);
-  //         printf("\n");
-  //       } else if(fileInode->type == '-'){
-  //         printf("\nContenido de: %s\n\n", buffer);
-  //         printf("%s\n\n", (char *) getBlock(datos, fileInode, 0));
-  //         printf("------------------------------\n\n");
-  //       }
-  //       break;
-  //     case 5:
-  //       delete(datos, listaInodos, &indiceLBL, &indiceLIL, LIL, LBL);
-  //       format(boot, super, listaInodos, datos, &indiceLIL, &indiceLBL);
-  //       break;
-  //     case 6:
-  //       roundRobin();
-  //       break;
-  //     case -1:
-  //       break;
-  //     default:
-  //       printf("Opcion no soportada\n");
-  //   } //fin switch
-  // }
-
   return 0;
-}
-
-int menu(void){
-  int opc;
-  printf("Escoje una opcion\n\n");
-  printf("1. Crear Archivo\n");
-  printf("2. Crear Directorio\n");
-  printf("3. Listar /\n");
-  printf("4. Mostrar Contenidos de archivo\n");
-  printf("5. Eliminar archivo\n");
-  printf("6. Round Robin\n");
-  printf("-1. Terminar Programa\n");
-  scanf("%i", &opc);
-  return opc;
 }
 
 void printList(int list[], int actual, int ultimo){
