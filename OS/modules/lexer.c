@@ -21,11 +21,11 @@ Command commands [COMMANDSLEN] = {
     argc = 3
     argv = ["cp", "arch1", "dir1"]
 */
-void separateCommand(char *command, int *argc, char argv[][TOKENLEN]){
-  int i, count = 0;
+void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]){
+  int i, count;
 
-  trim(command);
   *argc = 0;
+  count = 0;
   for(i=0; i<=strlen(command); i++){
     if(command[i] == ' ' || command[i] == '\0'){
       argv[*argc][count] = '\0';
@@ -70,15 +70,25 @@ int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
 */
 void executeCommand(char *outputBuffer, User *user, char *command){
   int argc, error;
-  char argv[ARG_AMMOUNT][TOKENLEN];
+  char (*argv)[TOKENLEN];
+
+  trim(command);
+  printf("Trimmed: '%s'\n\n", command);
+  argv = (char(*)[TOKENLEN]) mallocArgv(command);
 
   separateCommand(command, &argc, argv);
+
+  int i;
+  for(i=0; i<argc; i++){
+    printf("Arg: %i => %s\n", i, argv[i]);
+  }
 
   error = execute(outputBuffer, user, argc, argv);
   if(error == -1){
     sprintf(outputBuffer, "Command \"%s\" not found", command);
   }
 
+  free(argv);
 }
 
 /*
@@ -107,7 +117,7 @@ void trim(char *buffer){
     else
       break;
   }
-  memcpy(temp, buffer, len-(counter-1));
+  memcpy(temp, buffer, len-(counter));
   strcpy(buffer, temp);
   free(temp);
 }
@@ -144,6 +154,20 @@ void separeParentPath(char *fullPath, char *parent, char *file){
     memcpy(parent, fullPath, i);
     parent[i] = '\0';
   }
+}
+
+char **mallocArgv(char *command){
+    char (*argv)[TOKENLEN];
+    int count = 0, i;
+
+    // Contar espacios
+    for(i=0; i<strlen(command); i++){
+      if(command[i] == ' ')
+        count++;
+    }
+    argv = malloc(sizeof(char[count][TOKENLEN]));
+
+    return (char **)argv;
 }
 
 void prepend(char* s, const char* t){
