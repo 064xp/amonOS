@@ -1,7 +1,7 @@
 #include "lexer.h"
 
 // Lista de comandos
-Command commands [COMMANDSLEN] = {
+Command commands [] = {
   {"ls", &ls},
   {"touch", &touch},
   {"mkdir", &mkdir},
@@ -9,7 +9,8 @@ Command commands [COMMANDSLEN] = {
   {"cd", &cd},
   {"pwd", &pwd},
   {"writef", &writef},
-  {"cat", &cat}
+  {"cat", &cat},
+  {"", (void*)NULL} // Debe estar este hasa el final para denotar el fin de la lista
 };
 
 /*
@@ -51,13 +52,14 @@ void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]){
 
 */
 int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
-  int i, retVal;
+  int i=0, retVal;
 
-  for(i=0; i<COMMANDSLEN; i++){
+  while(commands[i].function != NULL){
     if(strcmp(argv[0], commands[i].name) == 0){
       retVal = commands[i].function(outputBuffer, user, argc, argv);
       return retVal;
     }
+    i++;
   }
 
   sprintf(outputBuffer, "Command \"%s\" not found", argv[0]);
