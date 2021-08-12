@@ -265,3 +265,24 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   free(bu);
   return 0;
 }
+
+int createUser(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
+  int err;
+
+  if(argc < 3){
+    strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tcreateuser [username] [password]");
+    return 1;
+  }
+
+  err = addUser(argv[1], argv[2]);
+  if(err == 1){
+    strcpy(outputBuffer, "An error ocurred while creating a new user");
+    return 1;
+  } else if(err == 2){
+    strcpy(outputBuffer, "Error: Maximum ammount of users reached");
+    return 1;
+  }
+
+  sprintf(outputBuffer, "User \"%s\" created succesfullly", argv[1]);
+  return 0;
+}

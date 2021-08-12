@@ -14,5 +14,6 @@ int cd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int pwd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int writef(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
+int createUser(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 
 #endif

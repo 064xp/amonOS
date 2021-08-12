@@ -10,6 +10,7 @@ Command commands [] = {
   {"pwd", &pwd},
   {"writef", &writef},
   {"cat", &cat},
+  {"createuser", &createUser},
   {"", (void*)NULL} // Debe estar este hasa el final para denotar el fin de la lista
 };
 
