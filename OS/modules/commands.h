@@ -12,5 +12,6 @@ int mkdir(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]);
 int rm(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]);
 int cd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]);
 int pwd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]);
+int writef(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]);
 
 #endif

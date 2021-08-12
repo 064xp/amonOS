@@ -166,3 +166,66 @@ int pwd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   strcpy(outputBuffer, user->cwd);
   return 0;
 }
+
+int writef(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+  char fileContents[1024] = "", newFileBuff[1024] = "", filePath[TOKENLEN];
+  int i, bytesToWrite, newLen, currentLen;
+  iNodo fileInode;
+  Dir file;
+
+  if(argc < 3){
+    strcpy(outputBuffer, "Missing arguments.\nUsage:\n\twritef [options] [file] [file contents]\n\tOptions:\n\t\t-a: Append text to the end of the file");
+    return 1;
+  }
+
+  if(argv[1][0] == '-'){
+    i = 3;
+    strcpy(filePath, argv[2]);
+  }
+  else{
+    i = 2;
+    strcpy(filePath, argv[1]);
+  }
+
+  file = namei(filePath, user->cwd);
+
+  if(file.iNodo == -1){
+    sprintf(outputBuffer, "File \"%s\" not found", filePath);
+    return 1;
+  }
+
+  getInode(&fileInode, file.iNodo);
+
+  if(strcmp(argv[1], "-a") == 0){
+    getBlock(fileContents, fileInode.contentTable[0]);
+  }
+
+  for(; i<argc; i++){
+    strncat(newFileBuff, argv[i], strlen(argv[i]));
+    strncat(newFileBuff, " ", 2);
+  }
+
+  currentLen = strlen(fileContents);
+  newLen = strlen(newFileBuff);
+
+  // En caso de que el tamaño sobrepase 1k
+  if(newLen + currentLen >= 1024){
+    printf("Overflow condition\n");
+    bytesToWrite = newLen - ((currentLen + newLen) - 1023);
+  } else {
+    bytesToWrite = newLen;
+  }
+
+  strncat(fileContents, newFileBuff, bytesToWrite);
+
+  // actualizar tamaño
+  fileInode.size = strlen(fileContents);
+  writeInode(&fileInode, file.iNodo);
+
+  // Escribir a disco
+  writeBlock(fileContents, fileInode.contentTable[0], 1024);
+
+  sprintf(outputBuffer, "%i bytes written to file \"%s\"", bytesToWrite, filePath);
+
+  return 0;
+}

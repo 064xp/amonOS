@@ -7,7 +7,8 @@ Command commands [COMMANDSLEN] = {
   {"mkdir", &mkdir},
   {"rm", &rm},
   {"cd", &cd},
-  {"pwd", &pwd}
+  {"pwd", &pwd},
+  {"writef", &writef}
 };
 
 /*
@@ -73,15 +74,9 @@ void executeCommand(char *outputBuffer, User *user, char *command){
   char (*argv)[TOKENLEN];
 
   trim(command);
-  printf("Trimmed: '%s'\n\n", command);
   argv = (char(*)[TOKENLEN]) mallocArgv(command);
 
   separateCommand(command, &argc, argv);
-
-  int i;
-  for(i=0; i<argc; i++){
-    printf("Arg: %i => %s\n", i, argv[i]);
-  }
 
   error = execute(outputBuffer, user, argc, argv);
   if(error == -1){
@@ -118,6 +113,7 @@ void trim(char *buffer){
       break;
   }
   memcpy(temp, buffer, len-(counter));
+  temp[len-counter] = '\0';
   strcpy(buffer, temp);
   free(temp);
 }
