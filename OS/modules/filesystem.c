@@ -646,7 +646,7 @@ int fileExistsInDir(char *fileName, int parentInodeNum){
   getBlock(parentDir, parentInode.contentTable[0]);
 
   for(i=0; i<64; i++){
-    if(strcmp(parentDir[i].nombre, fileName) == 0)
+    if(strcmp(parentDir[i].nombre, fileName) == 0 && parentDir[i].iNodo != 0)
       return 1;
   }
 
