@@ -243,6 +243,7 @@ int cat(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   }
 
   buffer = malloc(1024 * argc-1);
+  strcpy(buffer, "");
 
   for(i=1; i<argc; i++){
     file = namei(argv[i], user->cwd);
