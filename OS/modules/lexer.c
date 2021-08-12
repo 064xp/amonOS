@@ -51,7 +51,7 @@ void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]){
   > Regresa -1 si no se encontró el comando
 
 */
-int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int execute(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   int i=0, retVal;
 
   while(commands[i].function != NULL){
@@ -73,7 +73,7 @@ int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   Recibe el comando completo a ejecutar, lo separa en argumentos
   y llama la función correspondiente con sus argumentos.
 */
-void executeCommand(char *outputBuffer, User *user, char *command){
+void executeCommand(char *outputBuffer, Session *user, char *command){
   int argc;
   char (*argv)[TOKENLEN];
 

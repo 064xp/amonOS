@@ -6,7 +6,7 @@
     1: Directorio no encontrado
     2: Archivo no es un directorio
 */
-int ls(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int ls(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   Dir foundFile;
   iNodo dirInode;
   Dir directory[64];
@@ -37,7 +37,7 @@ int ls(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   return 0;
 }
 
-int touch(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int touch(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char fileName[12];
   char parentPath[TOKENLEN];
   Dir parent;
@@ -71,7 +71,7 @@ int touch(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   return 0;
 }
 
-int mkdir(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int mkdir(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char dirName[12];
   char parentPath[TOKENLEN];
   Dir parent;
@@ -91,7 +91,7 @@ int mkdir(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
     return 1;
   }
 
-  if(create(dirName, parent, *user, 1)){
+  if(create(dirName, parent, *user, 1) <= 2){
     strcpy(outputBuffer, "An error ocurred while creating the directory");
     return 1;
   }
@@ -101,7 +101,7 @@ int mkdir(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
 
 }
 
-int rm(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int rm(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char parentPath[TOKENLEN];
   Dir file, parent;
   iNodo fileInode;
@@ -144,7 +144,7 @@ int rm(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   return 0;
 }
 
-int cd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int cd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char path[TOKENLEN];
 
   if(argc < 2){
@@ -162,12 +162,12 @@ int cd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   return 0;
 }
 
-int pwd(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int pwd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   strcpy(outputBuffer, user->cwd);
   return 0;
 }
 
-int writef(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int writef(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char fileContents[1024] = "", newFileBuff[1024] = "", filePath[TOKENLEN];
   int i, bytesToWrite, newLen, currentLen;
   iNodo fileInode;
@@ -230,12 +230,12 @@ int writef(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   return 0;
 }
 
-int cat(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char tempBuffer[1024];
   iNodo fileInode;
-  char *buffer;
+  char *buffer, *bu;
   Dir file;
-  int i;
+  int i, bytesToWrite;
 
   if(argc < 2){
     strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tcat [file1]...[file N]");
@@ -243,6 +243,8 @@ int cat(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   }
 
   buffer = malloc(1024 * argc-1);
+  bu = buffer;
+  memset(buffer, 0, 1024 * argc-1);
   strcpy(buffer, "");
 
   for(i=1; i<argc; i++){
@@ -254,11 +256,12 @@ int cat(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
     }
     getInode(&fileInode, file.iNodo);
     getBlock(tempBuffer, fileInode.contentTable[0]);
-    strncat(buffer, tempBuffer, strlen(tempBuffer));
+    strlen(tempBuffer) > 1024 ? bytesToWrite = 1024 : strlen(tempBuffer);
+    strncat(buffer, tempBuffer, bytesToWrite);
   }
 
   memcpy(outputBuffer, buffer, OUTPUT_BUF_LEN);
   outputBuffer[OUTPUT_BUF_LEN -1] = '\0';
-  free(buffer);
+  free(bu);
   return 0;
 }

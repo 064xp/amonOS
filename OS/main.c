@@ -30,7 +30,7 @@ void roundRobin(void);
 int main(){
   char outputBuffer[OUTPUT_BUF_LEN];
   char cmd[500];
-  User rootUsr = {"root", "/"};
+  Session rootUsr = {"root", "/"};
 
   fsInit();
 

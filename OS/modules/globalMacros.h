@@ -6,5 +6,6 @@
 #define TOTALBLKS 58
 // Tamaño del buffer de salida
 #define OUTPUT_BUF_LEN 3072
-
+// Cantidad maxima de usuarios
+#define TOTALUSERS 32
 #endif

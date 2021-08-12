@@ -7,8 +7,10 @@ void fsInit(){
   char super[2048];
   iNodo listaInodos[80]; // 5 bloques de 16 inodos
   Dir root[64];
+  int firstBoot;
 
-  if(load(super, listaInodos) == -1){
+  firstBoot = load(super, listaInodos);
+  if(firstBoot){
     printf("File System no encontrado, creando raiz...\n\n");
     initINodeList(listaInodos);
     initSuperBlock(super);
@@ -20,6 +22,39 @@ void fsInit(){
 
   fillLIL(listaInodos);
   fillLBL(super);
+
+  // Crear archivo usuarios
+  if(firstBoot){
+    initUserFile();
+  }
+}
+
+void initUserFile(){
+  Dir rootDir = {2, "/"}, etcDir;
+  Session rootSession = {"root", "/"};
+  int inodeNum, i;
+  User usersTable[TOTALUSERS] = {
+    {"root", "root", 0}
+  };
+  iNodo userFileInode;
+
+  rootDir = namei("/", NULL);
+  create("etc", rootDir, rootSession, 1);
+  etcDir = namei("/etc", NULL);
+  inodeNum = create("user", etcDir, rootSession, 0);
+  getInode(&userFileInode, inodeNum);
+
+
+  for(i=1; i<TOTALUSERS; i++){
+    strcpy(usersTable[i].name, "");
+    strcpy(usersTable[i].password, "");
+    usersTable[i].lastAccess = 0;
+  }
+
+  userFileInode.size = sizeof(User);
+
+  writeBlock(&usersTable, userFileInode.contentTable[0], 1024);
+  writeInode(&userFileInode, inodeNum);
 }
 
 int fillLIL(iNodo *listaInodos){
@@ -142,7 +177,7 @@ int load(char SB[2048], iNodo *LI){
   fd = open("Fs", O_RDONLY);
   if (fd==-1){
       perror("");
-      return -1;
+      return 1;
   }
 
   lseek(fd, 1024, SEEK_SET);
@@ -286,8 +321,9 @@ int freeBlock(int block){
     0: Creado exitosamente
     1: Directorio padre no valido
     2: Archivo ya existe
+    X: Cualquier otro número es el número de i nodo del nuevo archivo
 */
-int create(char *fileName, Dir parent, User user, char isDir){
+int create(char *fileName, Dir parent, Session user, char isDir){
   int i, j, inode, block;
   Dir tmpDir[64]; //1024 bytes
   iNodo parentInode, newInode;
@@ -364,7 +400,7 @@ int create(char *fileName, Dir parent, User user, char isDir){
       break;
     } //fin if
   } //fin for
-  return 0;
+  return inode;
 }
 
 /*
@@ -373,7 +409,7 @@ int create(char *fileName, Dir parent, User user, char isDir){
   TODO:
     Borrar directorios recursivamente
 */
-int delete(Dir file, Dir parent, User user, char isDir){
+int delete(Dir file, Dir parent, Session user, char isDir){
   int i;
   iNodo parentInode, fileInode;
   Dir parentDir[64];
