@@ -10,6 +10,7 @@
 
 #include "globalMacros.h"
 #include "lexer.h"
+#include "session.h"
 #include "user.h"
 
 //64 bytes total

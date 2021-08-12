@@ -10,8 +10,8 @@ Equipo:
 #include <fcntl.h>
 
 #include "modules/lexer.h"
+#include "modules/session.h"
 #include "modules/filesystem.h"
-#include "modules/user.h"
 
 typedef struct PCB {
   char estado;

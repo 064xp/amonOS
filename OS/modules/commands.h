@@ -3,7 +3,7 @@
 
 #include "filesystem.h"
 #include "lexer.h"
-#include "user.h"
+#include "session.h"
 #include "globalMacros.h"
 
 int ls(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
