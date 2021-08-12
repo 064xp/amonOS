@@ -8,7 +8,8 @@ Command commands [COMMANDSLEN] = {
   {"rm", &rm},
   {"cd", &cd},
   {"pwd", &pwd},
-  {"writef", &writef}
+  {"writef", &writef},
+  {"cat", &cat}
 };
 
 /*
@@ -59,6 +60,7 @@ int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
     }
   }
 
+  sprintf(outputBuffer, "Command \"%s\" not found", argv[0]);
   return -1;
 }
 
@@ -70,7 +72,7 @@ int execute(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
   y llama la función correspondiente con sus argumentos.
 */
 void executeCommand(char *outputBuffer, User *user, char *command){
-  int argc, error;
+  int argc;
   char (*argv)[TOKENLEN];
 
   trim(command);
@@ -78,10 +80,7 @@ void executeCommand(char *outputBuffer, User *user, char *command){
 
   separateCommand(command, &argc, argv);
 
-  error = execute(outputBuffer, user, argc, argv);
-  if(error == -1){
-    sprintf(outputBuffer, "Command \"%s\" not found", command);
-  }
+  execute(outputBuffer, user, argc, argv);
 
   free(argv);
 }

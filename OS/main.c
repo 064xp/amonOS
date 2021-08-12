@@ -20,7 +20,6 @@ typedef struct PCB {
   int tEjec;
 } PCB;
 
-int menu(void);
 // Prototipos Round robin
 void printList(int list[], int actual, int ultimo);
 void imprimirEjeY(PCB tProcesos[], int cantidadProc);
@@ -29,7 +28,7 @@ int buscarIndice(int lista[], int pid, int len);
 void roundRobin(void);
 
 int main(){
-  char outputBuffer[2048];
+  char outputBuffer[OUTPUT_BUF_LEN];
   char cmd[500];
   User rootUsr = {"root", "/"};
 

@@ -229,3 +229,35 @@ int writef(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
 
   return 0;
 }
+
+int cat(char *outputBuffer, User *user, int argc, char argv[][TOKENLEN]){
+  char tempBuffer[1024];
+  iNodo fileInode;
+  char *buffer;
+  Dir file;
+  int i;
+
+  if(argc < 2){
+    strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tcat [file1]...[file N]");
+    return 1;
+  }
+
+  buffer = malloc(1024 * argc-1);
+
+  for(i=1; i<argc; i++){
+    file = namei(argv[i], user->cwd);
+    if(file.iNodo == -1){
+      sprintf(outputBuffer, "File \"%s\" not found", argv[i]);
+      free(buffer);
+      return 1;
+    }
+    getInode(&fileInode, file.iNodo);
+    getBlock(tempBuffer, fileInode.contentTable[0]);
+    strncat(buffer, tempBuffer, strlen(tempBuffer));
+  }
+
+  memcpy(outputBuffer, buffer, OUTPUT_BUF_LEN);
+  outputBuffer[OUTPUT_BUF_LEN -1] = '\0';
+  free(buffer);
+  return 0;
+}
