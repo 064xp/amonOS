@@ -28,15 +28,13 @@ void fsInit(){
     initUserFile();
   }
 
-  // addUser("paulo", "pass");
-
-  User userTable[32];
-  int i;
-  getBlock(userTable, 11);
-
-  for(i=0; i<32; i++){
-    printf("User: %s, pass: %s\n", userTable[i].name, userTable[i].password);
-  }
+  // User userTable[32];
+  // int i;
+  // getBlock(userTable, 11);
+  //
+  // for(i=0; i<32; i++){
+  //   printf("User: %s, pass: %s\n", userTable[i].name, userTable[i].password);
+  // }
 }
 
 void initUserFile(){
@@ -525,13 +523,14 @@ int updateSuperblock(int block, char status){
 
 }
 
-Dir namei(char *path, char *cwd){
+Dir namei(char *rawPath, char *cwd){
   Dir file = {-1, ""};
   Dir curDir[64];
   iNodo curInode;
-  char buffer[100], search = 0;
+  char buffer[100], search = 0, path[TOKENLEN];
   int i, j, cnt = 0;
 
+  strcpy(path, rawPath);
   //comenzamos en dir raiz
   if(getBlock(curDir, 9) == -1){
     printf("Error getBlock\n");

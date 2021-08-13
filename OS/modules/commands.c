@@ -235,23 +235,25 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   iNodo fileInode;
   char *buffer, *bu;
   Dir file;
-  int i, bytesToWrite;
+  int i, bytesToWrite, bufferLen;
 
   if(argc < 2){
     strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tcat [file1]...[file N]");
     return 1;
   }
 
-  buffer = malloc(1024 * argc-1);
+  bufferLen = 1024 * argc-1;
+  buffer = malloc(bufferLen);
   bu = buffer;
-  memset(buffer, 0, 1024 * argc-1);
-  strcpy(buffer, "");
+  memset(buffer, 0, bufferLen);
 
   for(i=1; i<argc; i++){
+    printf("argv1 %s, cwd, %s\n", argv[i], user->cwd);
     file = namei(argv[i], user->cwd);
     if(file.iNodo == -1){
       sprintf(outputBuffer, "File \"%s\" not found", argv[i]);
-      free(buffer);
+      free(bu);
+      break;
       return 1;
     }
     getInode(&fileInode, file.iNodo);
@@ -260,7 +262,9 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
     strncat(buffer, tempBuffer, bytesToWrite);
   }
 
-  memcpy(outputBuffer, buffer, OUTPUT_BUF_LEN);
+  bytesToWrite = bufferLen > OUTPUT_BUF_LEN ? OUTPUT_BUF_LEN : bufferLen;
+
+  memcpy(outputBuffer, buffer, bytesToWrite);
   outputBuffer[OUTPUT_BUF_LEN -1] = '\0';
   free(bu);
   return 0;
