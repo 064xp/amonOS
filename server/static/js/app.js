@@ -13,22 +13,22 @@ input.addEventListener("keyup", e => {
   </p>
   `;
   if (code == 13) {
-    const input = e.target.value;
-    const user = "root";
-    const cwd = "/";
-    const sym = user === "root" ? "#" : "$";
-    const output = "test output";
+    const command = e.target.value;
 
     e.target.value = "";
-    appendHTML(outputBox, template, [user, cwd, sym, input, output]);
-    // axios
-    //   .post("/request", { user: usuario.value, command: cmd.value })
-    //   .catch(error => {
-    //     console.log(error);
-    //   })
-    //   .then(res => {
-    //     console.log(res.data);
-    //   });
+    axios
+      .post("/request", { command: command })
+      .catch(error => {
+        console.log(error);
+      })
+      .then(res => {
+        console.log(res.data);
+        // const user = "root";
+        // const cwd = "/";
+        // const sym = user === "root" ? "#" : "$";
+        // const output = "test output";
+        // appendHTML(outputBox, template, [user, cwd, sym, command, output]);
+      });
   }
 });
 

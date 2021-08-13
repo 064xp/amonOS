@@ -64,7 +64,7 @@ int main(){
     executeCommand(output.buffer, &rootUsr, input.buffer);
     strcpy(output.user, rootUsr.name);
     strcpy(output.cwd, rootUsr.cwd);
-    output.secCode = 123;
+    output.secCode = input.secCode;
 
     printf("Res> %s\n", output.buffer);
     write(fdOut, &output, sizeof(ResponsePacket));

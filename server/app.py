@@ -4,17 +4,16 @@ import time
 import threading
 import sqlite3
 from ipc import leerOutput, escribirInput, packPacket, unpackPacket
-from db import insertResponse, getResponse, deleteResponse, initDatabase, getAllResponses
+from db import insertResponse, insertRequest, getResponse, requestCleanup, initDatabase, getAllResponses
 
 app = Flask(__name__)
-conn = sqlite3.connect('responses.db', check_same_thread = False)
 
 def lectura():
+    conn = sqlite3.connect('responses.db')
     while True:
         res = leerOutput()
-        print("recieved res")
-        #convertir en diccionario
         usuarioBytes, cwdBytes, bufferBytes, secCode = unpackPacket(res)
+        print(f'recieved response with secCode {secCode}')
 
         user = usuarioBytes.decode('utf8').strip('\x00')
         cwd = cwdBytes.decode('utf8').strip('\x00')
@@ -25,24 +24,38 @@ def lectura():
 def index():
     return render_template("index.html")
 
+@app.route('/clean')
+def clean():
+    if 'user' in session:
+        session.pop("user")
+    if 'secCode' in session:
+        session.pop("secCode")
+    return 'Cleaned!'
 
 @app.route('/request', methods = ['POST'])
 def requestHandler():
+    conn = sqlite3.connect('responses.db')
     command = request.json.get('command')
-    user = request.json.get('user')
+    try:
+        user = session['user']
+    except:
+        user = ''
+
     cmdBytes = bytes(command, 'utf-8')
     userBytes = bytes(user, 'utf-8')
-    # secCode = session["secCode"]
-    secCode = 123
-    count = 0
-
+    secCode = insertRequest(conn, user)
+    print(f'new request with secCode {secCode}')
     estructura = packPacket(userBytes, secCode, cmdBytes)
     escribirInput(estructura)
+
+    count = 0
     while True:
         if count > 100:
             break;
-        # print(requestBuffer)
-        response = getResponse(conn, user)
+
+        response = getResponse(conn, secCode)
+        print(f'looking for secCode {secCode}')
+        print(response)
         if response is not None:
             session["user"] = response[0]
             json =  jsonify({
@@ -51,14 +64,15 @@ def requestHandler():
                 'buffer': response[2],
                 'secCode': response[3],
             })
-            deleteResponse(conn, user)
+            requestCleanup(conn, secCode)
             return json
         count += 1
         time.sleep(.2)
 
-    return "Timeout"
+    return "Timeout", 408
 
 if __name__ == '__main__':
+    conn = sqlite3.connect('responses.db')
     thread = threading.Thread(target = lectura)
     thread.start()
     initDatabase(conn)
