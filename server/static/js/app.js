@@ -1,13 +1,7 @@
 const input = document.querySelector("#prompt-input");
 const outputBox = document.querySelector("#output-box");
 
-const focusInput = () => {
-  setTimeout(() => {
-    input.focus();
-  }, 100);
-};
-
-input.addEventListener("keypress", e => {
+input.addEventListener("keyup", e => {
   const code = e.keyCode ? e.keyCode : e.which;
   const template = `
   <p class="prompt-text">
@@ -51,6 +45,11 @@ const escapeHTML = str => {
   return new Option(str).innerHTML;
 };
 
-// Global Event listener
-document.addEventListener("click", focusInput);
-input.addEventListener("blur", focusInput);
+const focusInput = e => {
+  setTimeout(() => {
+    input.focus();
+  }, 100);
+};
+
+// Global Event listeneVr
+document.addEventListener("keyup", focusInput);
