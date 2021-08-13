@@ -21,8 +21,13 @@ def lectura():
         buffer = bufferBytes.decode('utf8').strip('\x00')
         insertResponse(conn, user, cwd, buffer, secCode)
 
+@app.route('/')
+def index():
+    return render_template("index.html")
+
+
 @app.route('/request', methods = ['POST'])
-def inicio():
+def requestHandler():
     command = request.json.get('command')
     user = request.json.get('user')
     cmdBytes = bytes(command, 'utf-8')
