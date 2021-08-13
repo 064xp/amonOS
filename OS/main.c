@@ -20,6 +20,19 @@ typedef struct PCB {
   int tEjec;
 } PCB;
 
+typedef struct __attribute__((__packed__)) resPacket {
+  char user[12];
+  char cwd[TOKENLEN];
+  char buffer[OUTPUT_BUF_LEN];
+  int secCode;
+} ResponsePacket;
+
+typedef struct __attribute__((__packed__)) reqPacket {
+  char user[12];
+  char buffer[OUTPUT_BUF_LEN];
+  int secCode;
+} RequestPacket;
+
 // Prototipos Round robin
 void printList(int list[], int actual, int ultimo);
 void imprimirEjeY(PCB tProcesos[], int cantidadProc);
@@ -28,16 +41,36 @@ int buscarIndice(int lista[], int pid, int len);
 void roundRobin(void);
 
 int main(){
-  char outputBuffer[OUTPUT_BUF_LEN];
-  char cmd[500];
+  RequestPacket input;
+  ResponsePacket output;
   Session rootUsr = {"root", "/"};
+  int fdIn, fdOut;
 
   fsInit();
 
   while(1){
-    gets(cmd);
-    executeCommand(outputBuffer, &rootUsr, cmd);
-    printf("%s\n", outputBuffer);
+    fdIn = open("input", O_RDONLY);
+    fdOut = open("output", O_WRONLY);
+    memset(output.buffer, 0, OUTPUT_BUF_LEN); // change to real buff len
+    memset(output.cwd, 0, TOKENLEN); // change to real buff len
+    memset(output.user, 0, 12);
+    output.secCode = 0;
+
+    printf("\nWaiting for a command...\n");
+    read(fdIn, &input, sizeof(RequestPacket));
+    printf("\nRecieved command from %s > %s\n", input.user, input.buffer);
+
+    // Craft packet
+    executeCommand(output.buffer, &rootUsr, input.buffer);
+    strcpy(output.user, rootUsr.name);
+    strcpy(output.cwd, rootUsr.cwd);
+    output.secCode = 123;
+
+    printf("Res> %s\n", output.buffer);
+    write(fdOut, &output, sizeof(ResponsePacket));
+
+    close(fdIn);
+    close(fdOut);
   }
   return 0;
 }
