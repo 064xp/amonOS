@@ -11,7 +11,8 @@ Command commands [] = {
   {"writef", &writef},
   {"cat", &cat},
   {"createuser", &createUser},
-  {"", (void*)NULL} // Debe estar este hasa el final para denotar el fin de la lista
+  {"login", &login},
+  // {"", (void*)NULL} // Debe estar este hasa el final para denotar el fin de la lista
 };
 
 /*
@@ -55,12 +56,13 @@ void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]){
 int execute(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   int i=0, retVal;
 
-  while(commands[i].function != NULL){
+  // while(commands[i].function != NULL){
+  for(i=0; i<COUNT_OF(commands); i++){
     if(strcmp(argv[0], commands[i].name) == 0){
       retVal = commands[i].function(outputBuffer, user, argc, argv);
       return retVal;
     }
-    i++;
+    // i++;
   }
 
   sprintf(outputBuffer, "Command \"%s\" not found", argv[0]);

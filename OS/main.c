@@ -13,6 +13,7 @@ Equipo:
 #include "modules/filesystem.h"
 #include "modules/fsDefinitions.h"
 #include "modules/user.h"
+#include "modules/userActions.h"
 
 typedef struct PCB {
   char estado;
@@ -48,6 +49,7 @@ int main(){
   int fdIn, fdOut;
 
   fsInit();
+  initSessions();
 
   while(1){
     fdIn = open("input", O_RDONLY);

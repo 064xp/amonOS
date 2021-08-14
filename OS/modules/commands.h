@@ -1,8 +1,8 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include "filesystem.h"
 #include "fsDefinitions.h"
+#include "filesystem.h"
 #include "lexer.h"
 #include "user.h"
 #include "userActions.h"
@@ -17,5 +17,6 @@ int pwd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int writef(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int createUser(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
+int login(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 
 #endif

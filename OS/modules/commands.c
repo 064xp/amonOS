@@ -291,3 +291,25 @@ int createUser(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN
   sprintf(outputBuffer, "User \"%s\" created succesfullly", argv[1]);
   return 0;
 }
+
+
+int login(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
+  int retVal;
+
+  if(argc < 3){
+    strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tlogin [username] [password]");
+    return 1;
+  }
+
+  retVal = createSession(user, argv[1], argv[2]);
+
+  if(retVal == 1){
+    strcpy(outputBuffer, "An error ocurred while reading the user table.");
+    return 1;
+  } else if(retVal == 2){
+    strcpy(outputBuffer, "Incorrect credentials");
+    return 1;
+  }
+
+  return 0;
+}
