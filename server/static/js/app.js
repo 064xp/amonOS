@@ -10,7 +10,7 @@ input.addEventListener("keyup", e => {
     >@amonOS:<span class="prompt-cwd" >{{2}}</span
     ><span class="prompt-sym" id="prompt-sym-input">{{3}}</span>
     <span class="input-text">{{4}}</span>
-    <p class="output-text">{{5}}</p>
+    <pre class="output-text">{{5}}</pre>
   </p>
   `;
   if (code == 13) {
@@ -50,9 +50,8 @@ input.addEventListener("keyup", e => {
 
 const appendHTML = (parent, str, values) => {
   values.forEach((value, index) => {
-    let valueAdjusted = value.replaceAll("\n", "<br />");
     var findStr = "{{" + (index + 1) + "}}";
-    str = str.replaceAll(findStr, valueAdjusted);
+    str = str.replaceAll(findStr, value);
   });
   parent.innerHTML += str;
   return str;
