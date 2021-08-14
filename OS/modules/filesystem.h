@@ -10,24 +10,9 @@
 
 #include "globalMacros.h"
 #include "lexer.h"
-#include "session.h"
 #include "user.h"
+#include "fsDefinitions.h"
 
-//64 bytes total
-typedef struct iNodo {
-  char type;
-  char perms[6];
-  unsigned char links;
-  char owner[12];
-  unsigned int size;
-  unsigned int lastModified;
-  int contentTable[9];
-} iNodo;
-
-typedef struct dir {
-  int iNodo;
-  char nombre[12];
-} Dir;
 
 typedef struct freeQueue {
   int list[256];

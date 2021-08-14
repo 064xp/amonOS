@@ -9,7 +9,6 @@
 #include "globalMacros.h"
 #include "commands.h"
 #include "user.h"
-#include "session.h"
 
 typedef struct command {
   char name[TOKENLEN];

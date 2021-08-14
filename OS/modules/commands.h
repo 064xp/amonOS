@@ -2,8 +2,10 @@
 #define COMMANDS_H
 
 #include "filesystem.h"
+#include "fsDefinitions.h"
 #include "lexer.h"
-#include "session.h"
+#include "user.h"
+#include "userActions.h"
 #include "globalMacros.h"
 
 int ls(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);

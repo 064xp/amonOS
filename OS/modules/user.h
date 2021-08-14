@@ -1,9 +1,9 @@
 #ifndef USER_H
 #define USER_H
 
-#include "globalMacros.h"
-#include "filesystem.h"
 #include <time.h>
+
+#include "globalMacros.h"
 
 typedef struct user {
   char name[12];
@@ -11,6 +11,12 @@ typedef struct user {
   time_t lastAccess;
 } User;
 
-int addUser(char *name, char *password);
+typedef struct session {
+  char name[12];
+  char cwd[TOKENLEN]; // Current Working directory
+  time_t lastAccess;
+} Session;
 
+
+int getOldestSessionAccess(Session *activeSessions);
 #endif
