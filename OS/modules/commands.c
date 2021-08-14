@@ -246,6 +246,7 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   buffer = malloc(bufferLen);
   bu = buffer;
   memset(buffer, 0, bufferLen);
+  memset(outputBuffer, 0, OUTPUT_BUF_LEN);
 
   for(i=1; i<argc; i++){
     printf("argv1 %s, cwd, %s\n", argv[i], user->cwd);

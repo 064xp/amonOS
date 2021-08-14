@@ -4,6 +4,11 @@ body {
   font-family: "Space Mono", monospace;
 }
 
+.container {
+  height: 95vh;
+  overflow-y: scroll;
+}
+
 .prompt-container {
   display: flex;
 }

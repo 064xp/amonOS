@@ -13,7 +13,6 @@ def lectura():
     while True:
         res = leerOutput()
         usuarioBytes, cwdBytes, bufferBytes, secCode = unpackPacket(res)
-        print(f'recieved response with secCode {secCode}')
 
         user = usuarioBytes.decode('utf8').strip('\x00')
         cwd = cwdBytes.decode('utf8').strip('\x00')
@@ -44,7 +43,6 @@ def requestHandler():
     cmdBytes = bytes(command, 'utf-8')
     userBytes = bytes(user, 'utf-8')
     secCode = insertRequest(conn, user)
-    print(f'new request with secCode {secCode}')
     estructura = packPacket(userBytes, secCode, cmdBytes)
     escribirInput(estructura)
 
@@ -54,8 +52,6 @@ def requestHandler():
             break;
 
         response = getResponse(conn, secCode)
-        print(f'looking for secCode {secCode}')
-        print(response)
         if response is not None:
             session["user"] = response[0]
             json =  jsonify({
@@ -67,8 +63,9 @@ def requestHandler():
             requestCleanup(conn, secCode)
             return json
         count += 1
-        time.sleep(.2)
+        time.sleep(.01)
 
+    requestCleanup(conn, secCode)
     return "Timeout", 408
 
 if __name__ == '__main__':

@@ -16,22 +16,24 @@
     />
   </head>
   <body>
-    <div id="output-box"></div>
-    <div class="prompt-container">
-      <p class="prompt-text">
-        <span class="prompt-user" id="prompt-user-input">root</span
-        >@amonOS:<span class="prompt-cwd" id="prompt-cwd-input">/</span
-        ><span class="prompt-sym" id="prompt-sym-input">#</span>
-      </p>
+    <section class="container">
+      <div id="output-box"></div>
+      <div class="prompt-container">
+        <p class="prompt-text">
+          <span class="prompt-user" id="prompt-user-input">root</span
+          >@amonOS:<span class="prompt-cwd" id="prompt-cwd-input">/</span
+          ><span class="prompt-sym" id="prompt-sym-input">#</span>
+        </p>
 
-      <input
-        type="text"
-        autocomplete="off"
-        name="command"
-        id="prompt-input"
-        autofocus
-      />
-    </div>
+        <input
+          type="text"
+          autocomplete="off"
+          name="command"
+          id="prompt-input"
+          autofocus
+        />
+      </div>
+    </section>
   </body>
   <script src="{{url_for('static', filename='js/app.js')}}"></script>
   <script src="{{url_for('static', filename='js/axios.min.js')}}"></script>
