@@ -13,6 +13,7 @@
 typedef struct command {
   char name[TOKENLEN];
   int (*function)(char*, Session*, int, char[][TOKENLEN]);
+  char needsAuth;
 } Command;
 
 void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]);

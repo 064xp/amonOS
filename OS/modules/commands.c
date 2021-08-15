@@ -311,5 +311,6 @@ int login(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
     return 1;
   }
 
+  sprintf(outputBuffer, "Logged in succesfullly as user \"%s\"", argv[1]);
   return 0;
 }

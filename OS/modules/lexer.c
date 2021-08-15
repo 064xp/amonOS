@@ -2,17 +2,16 @@
 
 // Lista de comandos
 Command commands [] = {
-  {"ls", &ls},
-  {"touch", &touch},
-  {"mkdir", &mkdir},
-  {"rm", &rm},
-  {"cd", &cd},
-  {"pwd", &pwd},
-  {"writef", &writef},
-  {"cat", &cat},
-  {"createuser", &createUser},
-  {"login", &login},
-  // {"", (void*)NULL} // Debe estar este hasa el final para denotar el fin de la lista
+  {"ls", &ls, 1},
+  {"touch", &touch, 1},
+  {"mkdir", &mkdir, 1},
+  {"rm", &rm, 1},
+  {"cd", &cd, 1},
+  {"pwd", &pwd, 1},
+  {"writef", &writef, 1},
+  {"cat", &cat, 1},
+  {"createuser", &createUser, 0},
+  {"login", &login, 0},
 };
 
 /*
@@ -54,15 +53,18 @@ void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]){
 
 */
 int execute(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
-  int i=0, retVal;
+  int i;
 
-  // while(commands[i].function != NULL){
   for(i=0; i<COUNT_OF(commands); i++){
     if(strcmp(argv[0], commands[i].name) == 0){
-      retVal = commands[i].function(outputBuffer, user, argc, argv);
-      return retVal;
+      // Si el comando requiere autenticacion y el usuario esta autenticado
+      if((commands[i].needsAuth && user->name[0] != 0) || !commands[i].needsAuth){
+        return commands[i].function(outputBuffer, user, argc, argv);
+      } else if(commands[i].needsAuth && user->name[0] == 0){
+        sprintf(outputBuffer, "Command \"%s\" requires authentication. Login to continue.", argv[0]);
+        return -1;
+      }
     }
-    // i++;
   }
 
   sprintf(outputBuffer, "Command \"%s\" not found", argv[0]);

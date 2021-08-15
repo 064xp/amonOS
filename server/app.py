@@ -21,14 +21,13 @@ def lectura():
 
 @app.route('/')
 def index():
+    session["user"] = ""
     return render_template("index.html")
 
 @app.route('/clean')
 def clean():
     if 'user' in session:
         session.pop("user")
-    if 'secCode' in session:
-        session.pop("secCode")
     return 'Cleaned!'
 
 @app.route('/request', methods = ['POST'])
@@ -66,7 +65,7 @@ def requestHandler():
         time.sleep(.01)
 
     requestCleanup(conn, secCode)
-    return "Timeout", 408
+    return jsonify({"error": "Request to server timed out"}), 408
 
 if __name__ == '__main__':
     conn = sqlite3.connect('responses.db')

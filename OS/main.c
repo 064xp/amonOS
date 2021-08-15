@@ -14,6 +14,7 @@ Equipo:
 #include "modules/fsDefinitions.h"
 #include "modules/user.h"
 #include "modules/userActions.h"
+#include "modules/IPCtypes.h"
 
 typedef struct PCB {
   char estado;
@@ -21,19 +22,6 @@ typedef struct PCB {
   char progCounter;
   int tEjec;
 } PCB;
-
-typedef struct __attribute__((__packed__)) resPacket {
-  char user[12];
-  char cwd[TOKENLEN];
-  char buffer[OUTPUT_BUF_LEN];
-  int secCode;
-} ResponsePacket;
-
-typedef struct __attribute__((__packed__)) reqPacket {
-  char user[12];
-  char buffer[OUTPUT_BUF_LEN];
-  int secCode;
-} RequestPacket;
 
 // Prototipos Round robin
 void printList(int list[], int actual, int ultimo);
@@ -43,9 +31,8 @@ int buscarIndice(int lista[], int pid, int len);
 void roundRobin(void);
 
 int main(){
-  RequestPacket input;
-  ResponsePacket output;
-  Session rootUsr = {"root", "/"};
+  RequestPacket request;
+  ResponsePacket response;
   int fdIn, fdOut;
 
   fsInit();
@@ -54,27 +41,25 @@ int main(){
   while(1){
     fdIn = open("input", O_RDONLY);
     fdOut = open("output", O_WRONLY);
-    memset(output.buffer, 0, OUTPUT_BUF_LEN); // change to real buff len
-    memset(output.cwd, 0, TOKENLEN); // change to real buff len
-    memset(output.user, 0, 12);
-    output.secCode = 0;
+    memset(response.buffer, 0, OUTPUT_BUF_LEN); // change to real buff len
+    memset(response.cwd, 0, TOKENLEN); // change to real buff len
+    memset(response.user, 0, 12);
 
     printf("\nWaiting for a command...\n");
-    read(fdIn, &input, sizeof(RequestPacket));
-    printf("\nRecieved command from %s > %s\n", input.user, input.buffer);
+    read(fdIn, &request, sizeof(RequestPacket));
+    response.secCode = request.secCode;
+    printf("\nRecieved command from %s > %s\n", request.user, response.buffer);
 
     // Craft packet
-    executeCommand(output.buffer, &rootUsr, input.buffer);
-    strcpy(output.user, rootUsr.name);
-    strcpy(output.cwd, rootUsr.cwd);
-    output.secCode = input.secCode;
+    executeAuthenticated(&request, &response);
 
-    printf("Res> \n%s\n", output.buffer);
-    write(fdOut, &output, sizeof(ResponsePacket));
+    printf("Res> \n%s\n", response.buffer);
+    write(fdOut, &response, sizeof(ResponsePacket));
 
     close(fdIn);
     close(fdOut);
   }
+
   return 0;
 }
 

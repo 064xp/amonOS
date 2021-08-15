@@ -160,3 +160,25 @@ void initSessions(){
     activeSessions[i].lastAccess = 0;
   }
 }
+
+
+void executeAuthenticated(RequestPacket *request, ResponsePacket *response){
+  Session *userSession;
+  Session nullSession = {
+    "",
+    "/",
+    0
+  };
+  int sessionIndex;
+
+  if((sessionIndex = getOpenSesssionIndex(request->user)) == -1){
+    userSession = &nullSession;
+  } else {
+    userSession = &activeSessions[sessionIndex];
+  }
+
+  executeCommand(response->buffer, userSession, request->buffer);
+
+  strcpy(response->user, userSession->name);
+  strcpy(response->cwd, userSession->cwd);
+}
