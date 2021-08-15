@@ -108,7 +108,7 @@ int getOpenSesssionIndex(char *username){
       return i;
   }
 
-  return 0;
+  return -1;
 }
 
 /*
@@ -141,7 +141,7 @@ int createSession(Session *sesPtr, char *username, char *password){
       strcpy(activeSessions[sessionIndex].cwd, "/");
       activeSessions[sessionIndex].lastAccess = getCurrentTime();
 
-      sesPtr = &activeSessions[sessionIndex];
+      memcpy(sesPtr, &activeSessions[sessionIndex], sizeof(Session));
 
       //Update lastAccess
       updateUserInfo(username, password, getCurrentTime());
@@ -152,11 +152,27 @@ int createSession(Session *sesPtr, char *username, char *password){
   return 0;
 }
 
+/*
+  Retvals
+    0: Exitoso
+    1: Session pointer invalido
+*/
+int deleteSession(Session *sesPtr){
+  if(sesPtr == NULL)
+    return 1;
+
+  memset(sesPtr->name, 0, 12);
+  memset(sesPtr->cwd, 0, TOKENLEN);
+  sesPtr->lastAccess = 0;
+
+  return 0;
+}
+
 void initSessions(){
   int i;
   for(i=0; i<MAX_SESSIONS; i++){
     strcpy(activeSessions[i].name, "");
-    strcpy(activeSessions[i].cwd, "");
+    strcpy(activeSessions[i].name, "");
     activeSessions[i].lastAccess = 0;
   }
 }
@@ -166,19 +182,23 @@ void executeAuthenticated(RequestPacket *request, ResponsePacket *response){
   Session *userSession;
   Session nullSession = {
     "",
-    "/",
+    "",
     0
   };
   int sessionIndex;
 
-  if((sessionIndex = getOpenSesssionIndex(request->user)) == -1){
+  if(request->user[0] == 0){
     userSession = &nullSession;
   } else {
-    userSession = &activeSessions[sessionIndex];
+    if((sessionIndex = getOpenSesssionIndex(request->user)) == -1){
+      userSession = &nullSession;
+    } else {
+      userSession = &activeSessions[sessionIndex];
+    }
   }
 
   executeCommand(response->buffer, userSession, request->buffer);
-
   strcpy(response->user, userSession->name);
   strcpy(response->cwd, userSession->cwd);
+  userSession->lastAccess = getCurrentTime();
 }

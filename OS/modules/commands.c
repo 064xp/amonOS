@@ -292,7 +292,6 @@ int createUser(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN
   return 0;
 }
 
-
 int login(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   int retVal;
 
@@ -312,5 +311,14 @@ int login(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   }
 
   sprintf(outputBuffer, "Logged in succesfullly as user \"%s\"", argv[1]);
+  return 0;
+}
+
+int logout(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
+  char username[12];
+  strcpy(username, user->name);
+  deleteSession(user);
+  sprintf(outputBuffer, "Logged out of user \"%s\"", username);
+
   return 0;
 }

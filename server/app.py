@@ -24,12 +24,6 @@ def index():
     session["user"] = ""
     return render_template("index.html")
 
-@app.route('/clean')
-def clean():
-    if 'user' in session:
-        session.pop("user")
-    return 'Cleaned!'
-
 @app.route('/request', methods = ['POST'])
 def requestHandler():
     conn = sqlite3.connect('responses.db')
@@ -59,6 +53,7 @@ def requestHandler():
                 'buffer': response[2],
                 'secCode': response[3],
             })
+            print(f'Returned user: {response[0]}')
             requestCleanup(conn, secCode)
             return json
         count += 1

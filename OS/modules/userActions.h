@@ -18,5 +18,6 @@ int updateUserInfo(char *username, char *password, time_t lastAccess);
 int getOpenSesssionIndex(char *username);
 void initSessions(void);
 void executeAuthenticated(RequestPacket *request, ResponsePacket *response);
+int deleteSession(Session *sesPtr);
 
 #endif

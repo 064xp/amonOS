@@ -12,6 +12,7 @@ Command commands [] = {
   {"cat", &cat, 1},
   {"createuser", &createUser, 0},
   {"login", &login, 0},
+  {"logout", &logout, 1}
 };
 
 /*
@@ -71,7 +72,6 @@ int execute(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   return -1;
 }
 
-
 /*
   Función que debe ser llamada desde afuera
 
@@ -86,7 +86,6 @@ void executeCommand(char *outputBuffer, Session *user, char *command){
   argv = (char(*)[TOKENLEN]) mallocArgv(command);
 
   separateCommand(command, &argc, argv);
-
   execute(outputBuffer, user, argc, argv);
 
   free(argv);
