@@ -8,7 +8,8 @@ const promptSymInput = document.querySelector("#prompt-sym-input");
 const promptCwdInput = document.querySelector("#prompt-cwd-input");
 
 let isAuthenticated = false;
-let curUser = "";
+let prevUser = "";
+let prevCWD;
 
 input.addEventListener("keyup", e => {
   const code = e.keyCode ? e.keyCode : e.which;
@@ -66,16 +67,17 @@ input.addEventListener("keyup", e => {
         }
 
         appendHTML(outputBox, template, [
-          curUser,
-          cwdText.innerHTML,
-          curUser === "root" ? "#" : "$",
+          prevUser,
+          prevCWD,
+          prevUser === "root" ? "#" : "$",
           command,
           output
         ]);
         e.target.value = "";
         cwdText.innerText = cwd;
 
-        curUser = user;
+        prevUser = user;
+        prevCWD = cwd;
         container.scrollTop = container.scrollHeight;
       });
   }
