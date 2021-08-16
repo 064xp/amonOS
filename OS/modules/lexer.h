@@ -11,12 +11,6 @@
 #include "utils.h"
 #include "user.h"
 
-typedef struct command {
-  char name[TOKENLEN];
-  int (*function)(char*, Session*, int, char[][TOKENLEN]);
-  char needsAuth;
-} Command;
-
 void separateCommand(char *command, int *argc, char (*argv)[TOKENLEN]);
 int execute(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 void executeCommand(char *outputBuffer, Session *user, char *command);

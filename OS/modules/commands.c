@@ -1,5 +1,38 @@
 #include "commands.h"
 
+char lsDescription[] = "List the files in the given directory.";
+char touchDescription[] = "Create an empty text file.";
+char clearDescription[] = "Clear the terminal screen.";
+char mkdirDescription[] = "Create a new directory.";
+char rmDescription[] = "Delete a file.";
+char cdDescription[] = "Move into a new working directory.";
+char pwdDescription[] = "Print current working directory absolute path.";
+char catDescription[] = "Display the contents of one or more files.";
+char createuserDescription[] = "Create a new user.";
+char helpDescription[] = "Display a list of commands.";
+char writefDescription[] = "Write text into a file.";
+char loginDescription[] = "Login as a certain user.";
+char logoutDescription[] = "Logout as current user.";
+char rrDescription[] = "See round robin scheduling log.";
+
+// Lista de comandos
+Command commands [COMMANDSLEN] = {
+  {"ls", &ls, 1, lsDescription},
+  {"touch", &touch, 1, touchDescription},
+  {"mkdir", &mkdir, 1, mkdirDescription},
+  {"rm", &rm, 1, rmDescription},
+  {"cd", &cd, 1, cdDescription},
+  {"pwd", &pwd, 1, pwdDescription},
+  {"writef", &writef, 1, writefDescription},
+  {"cat", &cat, 1, catDescription},
+  {"createuser", &createUser, 0, createuserDescription},
+  {"login", &login, 0, loginDescription},
+  {"logout", &logout, 1, logoutDescription},
+  {"rr", &rr, 1, rrDescription},
+  {"clear", (void *)NULL, 0, clearDescription},
+  {"help", &help, 0, helpDescription}
+};
+
 /*
   Retvals
     0: Exitoso
@@ -342,5 +375,24 @@ int rr(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
 
   lseek(fd, offset, SEEK_SET);
   read(fd, outputBuffer, bytesToRead);
+  return 0;
+}
+
+int help(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
+  int i, j, separation = 16, spaces;
+
+  strcpy(outputBuffer, "");
+  strcat(outputBuffer, "Command\t\tDescription\n\n");
+  for(i=0; i<COUNT_OF(commands); i++){
+    spaces = separation - strlen(commands[i].name);
+
+    strcat(outputBuffer, commands[i].name);
+    for(j=0; j<spaces; j++){
+      strcat(outputBuffer, " ");
+    }
+    strcat(outputBuffer, commands[i].description);
+    strcat(outputBuffer, "\n");
+  }
+
   return 0;
 }

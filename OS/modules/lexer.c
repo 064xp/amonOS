@@ -1,20 +1,5 @@
 #include "lexer.h"
 
-// Lista de comandos
-Command commands [] = {
-  {"ls", &ls, 1},
-  {"touch", &touch, 1},
-  {"mkdir", &mkdir, 1},
-  {"rm", &rm, 1},
-  {"cd", &cd, 1},
-  {"pwd", &pwd, 1},
-  {"writef", &writef, 1},
-  {"cat", &cat, 1},
-  {"createuser", &createUser, 0},
-  {"login", &login, 0},
-  {"logout", &logout, 1},
-  {"rr", &rr, 1}
-};
 
 /*
   Separa el comando en cada espacio.
