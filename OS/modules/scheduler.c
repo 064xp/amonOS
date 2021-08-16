@@ -36,7 +36,7 @@ void roundRobin(){
 
   time(&currentTime);
 
-  sprintf(outputBuffer, "===>>> Round Robin >> %s \n\n", ctime(&currentTime));
+  sprintf(outputBuffer, "===>>> Round Robin >> %s \nQuantum: %i\n\n", ctime(&currentTime), quantum);
   strcat(outputBuffer, "Process Table:\n\n");
   strcat(outputBuffer, " PID\tProcess\t\tExecution Time\n");
   for(i=0; i<requests.size;  i++){
