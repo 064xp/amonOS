@@ -724,14 +724,3 @@ int dequeue(FreeQueue *queue){
     queue->size--;
     return element;
 }
-
-
-time_t getCurrentTime(){
-  time_t  secs;
-  struct timespec spec;
-
-  clock_gettime(CLOCK_REALTIME, &spec);
-  secs  = spec.tv_sec;
-
-  return secs;
-}

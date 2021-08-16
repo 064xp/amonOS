@@ -9,8 +9,9 @@
 #include <sys/types.h>
 
 #include "globalMacros.h"
-#include "lexer.h"
+// #include "lexer.h"
 #include "user.h"
+#include "utils.h"
 #include "fsDefinitions.h"
 
 
@@ -45,6 +46,5 @@ int fileExistsInDir(char *fileName, int parentInodeNum);
 
 int enqueue(FreeQueue *queue, int newVal);
 int dequeue(FreeQueue *queue);
-time_t getCurrentTime();
 
 #endif

@@ -9,6 +9,7 @@
 #include "filesystem.h"
 #include "lexer.h"
 #include "user.h"
+#include "utils.h"
 #include "IPCtypes.h"
 
 int createSession(Session *sesPtr, char *username, char *password);

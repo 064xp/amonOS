@@ -8,6 +8,7 @@
 
 #include "globalMacros.h"
 #include "commands.h"
+#include "utils.h"
 #include "user.h"
 
 typedef struct command {
@@ -22,6 +23,5 @@ void executeCommand(char *outputBuffer, Session *user, char *command);
 void trim(char *buffer);
 void separeParentPath(char *fullPath, char *parent, char *file);
 char **mallocArgv(char *command);
-void prepend(char* s, const char* t);
 
 #endif

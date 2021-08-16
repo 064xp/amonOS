@@ -170,9 +170,3 @@ char **mallocArgv(char *command){
 
     return (char **)argv;
 }
-
-void prepend(char* s, const char* t){
-    size_t len = strlen(t);
-    memmove(s + len, s, strlen(s) + 1);
-    memcpy(s, t, len);
-}
