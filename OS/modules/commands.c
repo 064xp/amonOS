@@ -249,7 +249,6 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   memset(outputBuffer, 0, OUTPUT_BUF_LEN);
 
   for(i=1; i<argc; i++){
-    printf("argv1 %s, cwd, %s\n", argv[i], user->cwd);
     file = namei(argv[i], user->cwd);
     if(file.iNodo == -1){
       sprintf(outputBuffer, "File \"%s\" not found", argv[i]);
@@ -259,10 +258,10 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
     }
     getInode(&fileInode, file.iNodo);
     getBlock(tempBuffer, fileInode.contentTable[0]);
-    strlen(tempBuffer) > 1024 ? bytesToWrite = 1024 : strlen(tempBuffer);
-    strncat(buffer, tempBuffer, bytesToWrite);
+    strcat(buffer, tempBuffer);
   }
 
+  bufferLen = strlen(buffer);
   bytesToWrite = bufferLen > OUTPUT_BUF_LEN ? OUTPUT_BUF_LEN : bufferLen;
 
   memcpy(outputBuffer, buffer, bytesToWrite);
