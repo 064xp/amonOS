@@ -13,6 +13,13 @@ body {
   overflow-y: scroll;
 }
 
+.welcome-message {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .prompt-container {
   display: flex;
 }
