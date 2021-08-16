@@ -12,7 +12,8 @@ Command commands [] = {
   {"cat", &cat, 1},
   {"createuser", &createUser, 0},
   {"login", &login, 0},
-  {"logout", &logout, 1}
+  {"logout", &logout, 1},
+  {"rr", &rr, 1}
 };
 
 /*

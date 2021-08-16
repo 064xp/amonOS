@@ -322,3 +322,26 @@ int logout(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
 
   return 0;
 }
+
+int rr(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
+  int fd, offset, bytesToRead;
+
+  fd = open("rr.log", O_RDONLY);
+  if(fd == -1){
+    strcpy(outputBuffer, "Scheduling log is empty");
+    return 1;
+  }
+
+  offset = lseek(fd, 0, SEEK_END);
+  if(offset < OUTPUT_BUF_LEN){
+    bytesToRead = offset;
+    offset = 0;
+  } else {
+    offset = offset - OUTPUT_BUF_LEN;
+    bytesToRead = OUTPUT_BUF_LEN;
+  }
+
+  lseek(fd, offset, SEEK_SET);
+  read(fd, outputBuffer, bytesToRead);
+  return 0;
+}

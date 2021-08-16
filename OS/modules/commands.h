@@ -19,5 +19,6 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int createUser(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int login(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 int logout(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
+int rr(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]);
 
 #endif
