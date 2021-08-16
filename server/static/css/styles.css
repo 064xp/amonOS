@@ -4,6 +4,10 @@ body {
   font-family: "Space Mono", monospace;
 }
 
+.hide {
+  display: none !important;
+}
+
 .container {
   height: 95vh;
   overflow-y: scroll;

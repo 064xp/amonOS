@@ -1,10 +1,19 @@
 const input = document.querySelector("#prompt-input");
 const outputBox = document.querySelector("#output-box");
 const cwdText = document.querySelector("#prompt-cwd-input");
+const authenticatedPrompt = document.querySelector(".authenticated-prompt");
+const unauthenticatedPrompt = document.querySelector(".unauthenticated-prompt");
+const promptUserInput = document.querySelector("#prompt-user-input");
+const promptSymInput = document.querySelector("#prompt-sym-input");
+const promptCwdInput = document.querySelector("#prompt-cwd-input");
+
+let isAuthenticated = false;
+let curUser = "";
 
 input.addEventListener("keyup", e => {
   const code = e.keyCode ? e.keyCode : e.which;
-  const template = `
+  const template = isAuthenticated
+    ? `
   <p class="prompt-text">
     <span class="prompt-user">{{1}}</span
     >@amonOS:<span class="prompt-cwd" >{{2}}</span
@@ -12,9 +21,17 @@ input.addEventListener("keyup", e => {
     <span class="input-text">{{4}}</span>
     <pre class="output-text">{{5}}</pre>
   </p>
+  `
+    : `
+  <p class="prompt-text">
+    <span class="prompt-sym" id="prompt-sym-input">> </span>
+    <span class="input-text">{{4}}</span>
+    <pre class="output-text">{{5}}</pre>
+  </p>
   `;
   if (code == 13) {
     const command = e.target.value;
+
     if (command == "clear") {
       outputBox.innerHTML = "";
       e.target.value = "";
@@ -33,16 +50,32 @@ input.addEventListener("keyup", e => {
         const output = res.data.buffer;
         const container = document.querySelector(".container");
 
+        if (user === "") isAuthenticated = false;
+        else isAuthenticated = true;
+
+        if (isAuthenticated) {
+          authenticatedPrompt.classList.remove("hide");
+          unauthenticatedPrompt.classList.add("hide");
+
+          promptUserInput.innerText = user;
+          promptCwdInput.innerText = cwd;
+          promptSymInput.innerText = sym;
+        } else {
+          authenticatedPrompt.classList.add("hide");
+          unauthenticatedPrompt.classList.remove("hide");
+        }
+
         appendHTML(outputBox, template, [
-          user,
+          curUser,
           cwdText.innerHTML,
-          sym,
+          curUser === "root" ? "#" : "$",
           command,
           output
         ]);
         e.target.value = "";
         cwdText.innerText = cwd;
 
+        curUser = user;
         container.scrollTop = container.scrollHeight;
       });
   }
