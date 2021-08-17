@@ -179,6 +179,8 @@ int rm(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
 
 int cd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
   char path[TOKENLEN];
+  Dir file;
+  iNodo fileInode;
 
   if(argc < 2){
     strcpy(outputBuffer, "Missing arguments.\nUsage:\n\tcd [new directory]");
@@ -187,6 +189,14 @@ int cd(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
 
   if(realPath(path, argv[1], user->cwd)){
     strcpy(outputBuffer, "No such file or directory");
+    return 1;
+  }
+
+  file = namei(path, user->cwd);
+  getInode(&fileInode, file.iNodo);
+
+  if(fileInode.type != 'd'){
+    sprintf(outputBuffer, "\"%s\" is not a directory", path);
     return 1;
   }
 
