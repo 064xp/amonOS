@@ -33,12 +33,14 @@ int main(){
     memset(response.user, 0, 12);
 
     read(fdIn, &request, sizeof(RequestPacket));
+    printf("[%i] Recieved command %s\n", request.secCode, request.buffer);
     response.secCode = request.secCode;
 
     // Craft packet
     scheduleRequest(&request, &response);
 
     write(fdOut, &response, sizeof(ResponsePacket));
+    printf(">> Wrote response for request %i\n", request.secCode);
 
     close(fdIn);
     close(fdOut);

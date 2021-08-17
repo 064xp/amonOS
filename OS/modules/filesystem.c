@@ -27,14 +27,6 @@ void fsInit(){
   if(firstBoot){
     initUserFile();
   }
-
-  // User userTable[32];
-  // int i;
-  // getBlock(userTable, 11);
-  //
-  // for(i=0; i<32; i++){
-  //   printf("User: %s, pass: %s\n", userTable[i].name, userTable[i].password);
-  // }
 }
 
 void initUserFile(){
