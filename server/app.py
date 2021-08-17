@@ -2,7 +2,10 @@ from flask import Flask, render_template, url_for, session, redirect, jsonify, r
 from struct import *
 import time
 import threading
+import subprocess
+from multiprocessing import Process
 import sqlite3
+
 from ipc import leerOutput, escribirInput, packPacket, unpackPacket
 from db import insertResponse, insertRequest, getResponse, requestCleanup, initDatabase, getAllResponses
 
@@ -62,10 +65,17 @@ def requestHandler():
     requestCleanup(conn, secCode)
     return jsonify({"error": "Request to server timed out"}), 408
 
+def runOS():
+    subprocess.run('./main', cwd='./OS')
+
 if __name__ == '__main__':
     conn = sqlite3.connect('responses.db')
     thread = threading.Thread(target = lectura)
     thread.start()
     initDatabase(conn)
     app.secret_key = 'super secret key'
+
+    p = Process(target=runOS)
+    p.start()
+
     app.run(debug = True, port = 3000)

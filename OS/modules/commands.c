@@ -300,7 +300,7 @@ int cat(char *outputBuffer, Session *user, int argc, char argv[][TOKENLEN]){
       return 1;
     }
     getInode(&fileInode, file.iNodo);
-    if(fileInode->size != 0){
+    if(fileInode.size != 0){
       getBlock(tempBuffer, fileInode.contentTable[0]);
       strcat(buffer, tempBuffer);
     }

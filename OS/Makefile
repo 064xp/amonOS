@@ -4,4 +4,4 @@ OBJS =  main.c modules/lexer.c modules/filesystem.c  modules/commands.c modules/
 LIBS =
 
 main: ${OBJ}
-	$(CC) ${OBJS} ${LIBS} ${CFLAGS} -o ./bin/$@
+	$(CC) ${OBJS} ${LIBS} ${CFLAGS} -o ../server/OS/$@

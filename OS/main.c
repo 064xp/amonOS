@@ -32,15 +32,12 @@ int main(){
     memset(response.cwd, 0, TOKENLEN); // change to real buff len
     memset(response.user, 0, 12);
 
-    printf("\nWaiting for a command...\n");
     read(fdIn, &request, sizeof(RequestPacket));
     response.secCode = request.secCode;
-    printf("\nRecieved command from %s > %s\n", request.user, response.buffer);
 
     // Craft packet
     scheduleRequest(&request, &response);
 
-    printf("Res> \n%s\n", response.buffer);
     write(fdOut, &response, sizeof(ResponsePacket));
 
     close(fdIn);

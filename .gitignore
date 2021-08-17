@@ -4,6 +4,7 @@ bin/
 Fs
 *.db
 *.log
+server/OS/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
