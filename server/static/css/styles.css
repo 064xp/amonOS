@@ -2,6 +2,7 @@ body {
   background: #242424;
   color: white;
   font-family: "Space Mono", monospace;
+  margin: 0;
 }
 
 .hide {
@@ -11,6 +12,8 @@ body {
 .container {
   height: 95vh;
   overflow-y: scroll;
+  width: 100vw;
+  box-sizing: border-box;
 }
 
 .welcome-message {
@@ -57,5 +60,7 @@ body {
 }
 
 .output-text {
+  width: 100%;
   margin: 0.2rem 0;
+  white-space: pre-wrap;
 }

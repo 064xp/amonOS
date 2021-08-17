@@ -17,6 +17,7 @@ void scheduleRequest(RequestPacket *request, ResponsePacket *response){
   // Si la diferencia entre el nuevo req y el ultimo que tenemos es > 5 segs
   if(curTime - requests.list[requests.end].time > TIME_BUFFER_SECS){
     roundRobin();
+    newReq.pid = 0;
   }
   enqueueProcess(&requests, newReq);
   executeAuthenticated(request, response);
@@ -108,5 +109,9 @@ ScheduledRequest dequeueProcess(RequestQueue *queue){
     element = queue->list[queue->start];
     queue->start = (queue->start+1) % queue->capacity;
     queue->size--;
+    if(queue->size == 0){
+      queue->start = 0;
+      queue->end = -1;
+    }
     return element;
 }

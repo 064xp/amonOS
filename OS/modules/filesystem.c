@@ -722,5 +722,10 @@ int dequeue(FreeQueue *queue){
     element = queue->list[queue->start];
     queue->start = (queue->start+1) % queue->capacity;
     queue->size--;
+
+    if(queue->size == 0){
+      queue->start = 0;
+      queue->end = -1;
+    }
     return element;
 }
